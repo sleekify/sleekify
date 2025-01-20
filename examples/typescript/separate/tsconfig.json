@@ -1,0 +1,17 @@
+{
+  "extends": "../../../tsconfig.json",
+
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "./"
+  },
+
+  "exclude": [],
+  "files": [
+    "types/node-sync/index.d.ts"
+  ],
+  "include": ["src/**/*", "test/**/*"],
+  "ts-node": {
+    "files": true
+  }
+}
