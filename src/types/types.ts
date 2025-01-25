@@ -228,13 +228,13 @@ interface SingleTypeNonArraySchemaObject extends BaseSchemaObject {
 };
 type BaseSchemaObject = Omit<Source.BaseSchemaObject, 'additionalProperties' | 'allOf' | 'anyOf' | 'discriminator' | 'examples' | 'externalDocs' | 'not' | 'oneOf' | 'properties' | 'xml'> & {
   additionalProperties?: boolean | SchemaObject
-  allOf?: SchemaObject
-  anyOf?: SchemaObject
+  allOf?: SchemaObject[]
+  anyOf?: SchemaObject[]
   discriminator?: DiscriminatorObject
   externalDocs?: ExternalDocumentationObject
   examples?: Record<string, ExampleObject>
   not?: SchemaObject
-  oneOf?: SchemaObject
+  oneOf?: SchemaObject[]
   properties?: Record<string, SchemaObject>
   xml?: XMLObject
 };
