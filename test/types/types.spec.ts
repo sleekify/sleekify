@@ -707,6 +707,45 @@ describe('Types', () => {
       'x-custom': true,
       $ref: '#/components/schemas/schema5'
     };
+
+    const schema6: SchemaObject = {
+      'x-custom': true,
+      allOf: [{
+        'x-custom': true
+      }],
+      anyOf: [{
+        'x-custom': true
+      }],
+      oneOf: [{
+        'x-custom': true
+      }],
+      not: {
+        'x-custom': true
+      },
+      additionalProperties: {
+        'x-custom': true
+      },
+      discriminator: {
+        'x-custom': true,
+        propertyName: 'type'
+      },
+      examples: {
+        example1: {
+          'x-custom': true
+        }
+      },
+      externalDocs: {
+        'x-custom': true,
+        url: '/my/url'
+      },
+      xml: {
+        'x-custom': true
+      }
+    };
+
+    const schema7: SchemaObject = {
+      additionalProperties: true
+    };
   });
 
   it('When standard properties are applied to SchemaObject, then they are allowed', () => {
