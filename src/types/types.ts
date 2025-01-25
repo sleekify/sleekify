@@ -213,11 +213,11 @@ export type SchemaObject = ((MixedTypeSchemaObject | SingleTypeSchemaObject) & C
 type MixedTypeSchemaObject = MixedTypeArraySchemaObject | MixedTypeNonArraySchemaObject;
 type SingleTypeSchemaObject = SingleTypeArraySchemaObject | SingleTypeNonArraySchemaObject;
 interface MixedTypeArraySchemaObject extends BaseSchemaObject {
-  type: [Source.ArraySchemaObjectType | 'null']
+  type: Array<Source.ArraySchemaObjectType | 'null'>
   items: SchemaObject
 };
 interface MixedTypeNonArraySchemaObject extends BaseSchemaObject {
-  type?: [Source.NonArraySchemaObjectType]
+  type?: Source.NonArraySchemaObjectType[]
 };
 interface SingleTypeArraySchemaObject extends BaseSchemaObject {
   type: Source.ArraySchemaObjectType

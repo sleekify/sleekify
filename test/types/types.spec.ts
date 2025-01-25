@@ -746,6 +746,16 @@ describe('Types', () => {
     const schema7: SchemaObject = {
       additionalProperties: true
     };
+
+    const schema8: SchemaObject = {
+      type: ['object', 'null'],
+      properties: {}
+    };
+
+    const schema9: SchemaObject = {
+      type: ['array', 'null'],
+      items: {}
+    };
   });
 
   it('When standard properties are applied to SchemaObject, then they are allowed', () => {
