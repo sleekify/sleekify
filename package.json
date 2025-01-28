@@ -1,6 +1,6 @@
 {
   "name": "@sleekify/sleekify",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A TypeScript decorator driven approach for developing web applications.",
   "scripts": {
     "build": "tsc",
