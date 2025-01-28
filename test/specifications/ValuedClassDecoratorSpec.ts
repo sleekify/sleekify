@@ -48,11 +48,37 @@ export class ValuedClassDecoratorSpec {
         }
 
         @decorator(this.decoratorValue2)
-        class ChildClass {
+        class ChildClass extends ParentClass {
           targetMethod (): void {
           }
         }
 
+        expect(Annotation.exists(ParentClass, undefined, this.decorator)).toBe(true);
+        expect(Annotation.get(ParentClass, undefined, this.decorator)).toStrictEqual(this.decoratorValue1);
+        expect(Annotation.exists(ChildClass, undefined, this.decorator)).toBe(true);
+        expect(Annotation.get(ChildClass, undefined, this.decorator)).toStrictEqual(this.decoratorValue2);
+      });
+
+      it('When applied to a child and grandparent class, the annotation can be read', () => {
+        @decorator(this.decoratorValue1)
+        class GrandparentClass {
+          targetMethod (): void {
+          }
+        }
+
+        class ParentClass extends GrandparentClass {
+          targetMethod (): void {
+          }
+        }
+
+        @decorator(this.decoratorValue2)
+        class ChildClass extends ParentClass {
+          targetMethod (): void {
+          }
+        }
+
+        expect(Annotation.exists(GrandparentClass, undefined, this.decorator)).toBe(true);
+        expect(Annotation.get(GrandparentClass, undefined, this.decorator)).toStrictEqual(this.decoratorValue1);
         expect(Annotation.exists(ParentClass, undefined, this.decorator)).toBe(true);
         expect(Annotation.get(ParentClass, undefined, this.decorator)).toStrictEqual(this.decoratorValue1);
         expect(Annotation.exists(ChildClass, undefined, this.decorator)).toBe(true);

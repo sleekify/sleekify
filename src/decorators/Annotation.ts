@@ -315,10 +315,9 @@ export class Annotation {
       isProperty = true;
     } else {
       const prototype = (target).prototype;
-      const instanceDescriptor = Object.getOwnPropertyDescriptor(prototype, propertyKey);
       const instanceTargetValue: any = (prototype)[propertyKey];
 
-      if (undefined !== instanceDescriptor && _.isFunction(instanceTargetValue)) {
+      if (_.isFunction(instanceTargetValue)) {
         /* property annotation */
         isProperty = true;
       }

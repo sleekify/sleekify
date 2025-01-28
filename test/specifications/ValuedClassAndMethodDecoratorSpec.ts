@@ -59,6 +59,32 @@ export class ValuedClassAndMethodDecoratorSpec {
         expect(Annotation.get(ChildClass, undefined, this.decorator)).toStrictEqual(this.decoratorValue2);
       });
 
+      it('When applied to a child and grandparent class, the annotation can be read', () => {
+        @decorator(this.decoratorValue1)
+        class GrandparentClass {
+          targetMethod (): void {
+          }
+        }
+
+        class ParentClass extends GrandparentClass {
+          targetMethod (): void {
+          }
+        }
+
+        @decorator(this.decoratorValue2)
+        class ChildClass extends ParentClass {
+          targetMethod (): void {
+          }
+        }
+
+        expect(Annotation.exists(GrandparentClass, undefined, this.decorator)).toBe(true);
+        expect(Annotation.get(GrandparentClass, undefined, this.decorator)).toStrictEqual(this.decoratorValue1);
+        expect(Annotation.exists(ParentClass, undefined, this.decorator)).toBe(true);
+        expect(Annotation.get(ParentClass, undefined, this.decorator)).toStrictEqual(this.decoratorValue1);
+        expect(Annotation.exists(ChildClass, undefined, this.decorator)).toBe(true);
+        expect(Annotation.get(ChildClass, undefined, this.decorator)).toStrictEqual(this.decoratorValue2);
+      });
+
       it('When not applied to a class method, the annotation cannot be read', () => {
         class TargetClass {
           targetMethod (): void {
@@ -102,6 +128,21 @@ export class ValuedClassAndMethodDecoratorSpec {
         expect(Annotation.get(ChildClass, 'parentMethod', this.decorator)).toStrictEqual(this.decoratorValue1);
         expect(Annotation.exists(ChildClass, 'childMethod', this.decorator)).toBe(true);
         expect(Annotation.get(ChildClass, 'childMethod', this.decorator)).toStrictEqual(this.decoratorValue2);
+      });
+
+      it('When applied to a parent class method, the annotation can be read', () => {
+        class ParentClass {
+          @decorator(this.decoratorValue1)
+          parentMethod (): void {
+          }
+        }
+
+        class ChildClass extends ParentClass {}
+
+        expect(Annotation.exists(ParentClass, 'parentMethod', this.decorator)).toBe(true);
+        expect(Annotation.get(ParentClass, 'parentMethod', this.decorator)).toStrictEqual(this.decoratorValue1);
+        expect(Annotation.exists(ChildClass, 'parentMethod', this.decorator)).toBe(true);
+        expect(Annotation.get(ChildClass, 'parentMethod', this.decorator)).toStrictEqual(this.decoratorValue1);
       });
 
       it('When not applied to a static class method, the annotation is not found', () => {

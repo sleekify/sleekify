@@ -64,6 +64,21 @@ export class ValuedMethodDecoratorSpec {
         expect(Annotation.get(ChildClass, 'childMethod', this.decorator)).toStrictEqual(this.decoratorValue2);
       });
 
+      it('When applied to a parent class method, the annotation can be read', () => {
+        class ParentClass {
+          @decorator(this.decoratorValue1)
+          parentMethod (): void {
+          }
+        }
+
+        class ChildClass extends ParentClass {}
+
+        expect(Annotation.exists(ParentClass, 'parentMethod', this.decorator)).toBe(true);
+        expect(Annotation.get(ParentClass, 'parentMethod', this.decorator)).toStrictEqual(this.decoratorValue1);
+        expect(Annotation.exists(ChildClass, 'parentMethod', this.decorator)).toBe(true);
+        expect(Annotation.get(ChildClass, 'parentMethod', this.decorator)).toStrictEqual(this.decoratorValue1);
+      });
+
       it('When not applied to a static class method, the annotation is not found', () => {
         class TargetClass {
           static targetMethod (): void {

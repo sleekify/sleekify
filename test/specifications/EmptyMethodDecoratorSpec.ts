@@ -60,6 +60,21 @@ export class EmptyMethodDecoratorSpec {
         expect(Annotation.get(ChildClass, 'childMethod', this.decorator)).toBeUndefined();
       });
 
+      it('When applied to a parent class method, the annotation can be read', () => {
+        class ParentClass {
+          @decorator()
+          parentMethod (): void {
+          }
+        }
+
+        class ChildClass extends ParentClass {}
+
+        expect(Annotation.exists(ParentClass, 'parentMethod', this.decorator)).toBe(true);
+        expect(Annotation.get(ParentClass, 'parentMethod', this.decorator)).toBeUndefined();
+        expect(Annotation.exists(ChildClass, 'parentMethod', this.decorator)).toBe(true);
+        expect(Annotation.get(ChildClass, 'parentMethod', this.decorator)).toBeUndefined();
+      });
+
       it('When not applied to a static class method, the annotation is not found', () => {
         class TargetClass {
           static targetMethod (): void {
