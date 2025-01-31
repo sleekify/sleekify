@@ -61,7 +61,8 @@ describe('Types', () => {
         myParameter1: {
           'x-custom': true,
           name: 'myParameter1',
-          in: 'query'
+          in: 'query',
+          content: {}
         }
       }
     };
@@ -224,7 +225,8 @@ describe('Types', () => {
     };
 
     const header3: HeaderObject = {
-      'x-custom': true
+      'x-custom': true,
+      content: {}
     };
   });
 
@@ -476,11 +478,13 @@ describe('Types', () => {
         {
           'x-custom': true,
           name: 'id1',
-          in: 'path'
+          in: 'path',
+          content: {}
         }
       ],
       requestBody: {
-        'x-custom': true
+        'x-custom': true,
+        content: {}
       },
       responses: {
         200: {
@@ -523,13 +527,32 @@ describe('Types', () => {
       description: 'my description',
       required: false,
       deprecated: false,
-      allowEmptyValue: true
+      allowEmptyValue: true,
+      content: {
+        'application/json': {
+          'x-custom': true
+        }
+      }
     };
 
     const parameterObject2: ParameterObject = {
       'x-custom': true,
       name: 'parameter1',
-      in: 'query'
+      in: 'query',
+      description: 'my description',
+      required: false,
+      deprecated: false,
+      allowEmptyValue: true,
+      schema: {
+        'x-custom': true
+      }
+    };
+
+    const parameterObject3: ParameterObject = {
+      'x-custom': true,
+      name: 'parameter1',
+      in: 'query',
+      content: {}
     };
   });
 
@@ -572,7 +595,8 @@ describe('Types', () => {
         {
           'x-custom': true,
           name: 'id1',
-          in: 'path'
+          in: 'path',
+          content: {}
         }
       ]
     };
@@ -610,7 +634,8 @@ describe('Types', () => {
     };
 
     const requestBodyObject2: RequestBodyObject = {
-      'x-custom': true
+      'x-custom': true,
+      content: {}
     };
   });
 
@@ -620,7 +645,8 @@ describe('Types', () => {
       description: 'my description',
       headers: {
         header1: {
-          'x-custom': true
+          'x-custom': true,
+          content: {}
         }
       },
       content: {

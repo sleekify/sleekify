@@ -53,12 +53,12 @@ export type ExternalDocumentationObject = Source.ExternalDocumentationObject & C
  */
 export type HeaderObject = ((ContentHeaderObject | SchemaHeaderObject) & CustomProperties) | ReferenceObject;
 type ContentHeaderObject = Omit<Source.HeaderObject, 'content' | 'examples' | 'schema'> & {
-  content?: Record<string, MediaTypeObject>
+  content: Record<string, MediaTypeObject>
   examples?: Record<string, ExampleObject>
 };
 type SchemaHeaderObject = Omit<Source.HeaderObject, 'content' | 'examples' | 'schema'> & {
   examples?: Record<string, ExampleObject>
-  schema?: SchemaObject
+  schema: SchemaObject
 };
 
 /**
@@ -155,9 +155,15 @@ export type OperationObject = Omit<Source.OperationObject, 'callbacks' | 'extern
 /**
  * @see https://spec.openapis.org/oas/v3.1.1.html#parameter-object
  */
-export type ParameterObject = (Omit<Source.ParameterObject, 'schema'> & CustomProperties & {
-  schema?: SchemaObject
-}) | ReferenceObject;
+export type ParameterObject = ((ContentParameterObject | SchemaParameterObject) & CustomProperties) | ReferenceObject;
+type ContentParameterObject = Omit<Source.ParameterObject, 'content' | 'examples' | 'schema'> & {
+  content: Record<string, MediaTypeObject>
+  examples?: Record<string, ExampleObject>
+};
+type SchemaParameterObject = Omit<Source.ParameterObject, 'content' | 'examples' | 'schema'> & {
+  examples?: Record<string, ExampleObject>
+  schema: SchemaObject
+};
 
 /**
  * @see https://spec.openapis.org/oas/v3.1.1.html#path-item-object
@@ -189,7 +195,7 @@ export type ReferenceObject = Source.ReferenceObject & CustomProperties;
  * @see https://spec.openapis.org/oas/v3.1.1.html#request-body-object
  */
 export type RequestBodyObject = (Omit<Source.RequestBodyObject, 'content'> & CustomProperties & {
-  content?: Record<string, MediaTypeObject>
+  content: Record<string, MediaTypeObject>
 }) | ReferenceObject;
 
 /**
