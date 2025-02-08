@@ -3,7 +3,6 @@ import _ from 'lodash';
 import path from 'node:path';
 import { PathUtil } from '../utils/PathUtil';
 import { StringUtil } from '../utils/StringUtil';
-import { glob } from 'glob';
 
 export interface AnnotationOptions {
   /* is the annotation inherited (default true) */
@@ -124,17 +123,20 @@ export class Annotation {
     const callerDirectory = PathUtil.filenameToDirectory(callerFilename);
     const currentDir = process.cwd();
     const tsConfigPath = `${currentDir}${path.sep}tsconfig.json`;
-    let tsOutDir;
+    let isTypeScript = false;
+    let hasTypesScriptOutDir = false;
 
-    if (/[.]ts$/.test(callerFilename) && fs.existsSync(tsConfigPath)) {
+    if (/[.]ts$/.test(callerFilename)) {
+      isTypeScript = true;
+    }
+
+    if (isTypeScript && fs.existsSync(tsConfigPath)) {
       const contents = fs.readFileSync(tsConfigPath);
       const tsConfig = JSON.parse(contents.toString());
       const outDir = tsConfig.compilerOptions?.outDir;
 
       if (outDir != null && outDir.length > 0) {
-        const startRegex = new RegExp(`^\\${path.sep}*`);
-        const endRegex = new RegExp(`\\${path.sep}*$`);
-        tsOutDir = outDir.replace(startRegex, '').replace(endRegex, '');
+        hasTypesScriptOutDir = true;
       }
     }
 
@@ -149,16 +151,14 @@ export class Annotation {
 
     updatedRelativePath = updatedRelativePath.replace(`.${path.sep}`, '');
 
-    let globPath = `${updatedDirectory}${updatedRelativePath !== '' ? `${path.sep}${updatedRelativePath}` : ''}${path.sep}**${path.sep}*.js`;
-
-    if (tsOutDir !== undefined) {
-      globPath = `${currentDir}${path.sep}${tsOutDir}${globPath.replace(currentDir, '')}`;
-    }
-
+    const globPath = `${updatedDirectory}${updatedRelativePath !== '' ? `${path.sep}${updatedRelativePath}` : ''}${path.sep}**${path.sep}`.replace(/\\/g, '/');
     const myDirectory = __dirname;
     const commonBasePath = PathUtil.getCommonBasePath(`${currentDir}${path.sep}`, `${myDirectory}${path.sep}`);
     const mySegmentCount = myDirectory.replace(commonBasePath, '').split(path.sep).length;
-    const modulePaths = await glob(globPath.replace(/\\/g, '/'));
+    const modulePaths = await PathUtil.getModulePaths(globPath, {
+      isTypeScript,
+      hasTypesScriptOutDir
+    });
     const modulePathPrefixSuffix = `${currentDir}${path.sep}`.replace(commonBasePath, '');
     const modulePathPrefix = `${`..${path.sep}`.repeat(mySegmentCount)}${modulePathPrefixSuffix}`;
     const moduleBasePath = `${currentDir}${path.sep}`;
