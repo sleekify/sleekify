@@ -69,4 +69,41 @@ describe('PathUtil', () => {
 
     expect(result).toBe('');
   });
+
+  it('When searching for JavaScript module paths, then the expected results are returned', async () => {
+    const globPath = `${__dirname.replace(/\\/g, '/')}/data/**/`;
+    const modulePaths = await PathUtil.getModulePaths(globPath, {
+      isTypeScript: false,
+      hasTypesScriptOutDir: false
+    });
+
+    expect(modulePaths.length).toBe(2);
+    expect(modulePaths.includes(`${__dirname}${path.sep}data${path.sep}other.js`)).toBe(true);
+    expect(modulePaths.includes(`${__dirname}${path.sep}data${path.sep}test.js`)).toBe(true);
+  });
+
+  it('When searching for TypeScript (inline) module paths, then the expected results are returned', async () => {
+    const globPath = `${__dirname.replace(/\\/g, '/')}/data/**/`;
+    const modulePaths = await PathUtil.getModulePaths(globPath, {
+      isTypeScript: true,
+      hasTypesScriptOutDir: false
+    });
+
+    expect(modulePaths.length).toBe(2);
+    expect(modulePaths.includes(`${__dirname}${path.sep}data${path.sep}other.js`)).toBe(true);
+    expect(modulePaths.includes(`${__dirname}${path.sep}data${path.sep}test.ts`)).toBe(true);
+  });
+
+  it('When searching for TypeScript (separate) module paths, then the expected results are returned', async () => {
+    const globPath = `${__dirname.replace(/\\/g, '/')}/data/**/`;
+    const modulePaths = await PathUtil.getModulePaths(globPath, {
+      isTypeScript: true,
+      hasTypesScriptOutDir: true
+    });
+
+    expect(modulePaths.length).toBe(3);
+    expect(modulePaths.includes(`${__dirname}${path.sep}data${path.sep}other.js`)).toBe(true);
+    expect(modulePaths.includes(`${__dirname}${path.sep}data${path.sep}test.js`)).toBe(true);
+    expect(modulePaths.includes(`${__dirname}${path.sep}data${path.sep}test.ts`)).toBe(true);
+  });
 });

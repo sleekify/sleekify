@@ -1,3 +1,4 @@
+import { glob } from 'glob';
 import path from 'node:path';
 
 export class PathUtil {
@@ -44,5 +45,35 @@ export class PathUtil {
     const commonBasePath = pathSepIndex >= 0 ? matchingPrefix.substring(0, pathSepIndex + 1) : matchingPrefix;
 
     return commonBasePath;
+  }
+
+  static async getModulePaths (globPath: string, options?: { isTypeScript: boolean, hasTypesScriptOutDir: boolean }): Promise<string[]> {
+    let modulePaths;
+
+    if (options?.isTypeScript === true) {
+      if (options?.hasTypesScriptOutDir) {
+        modulePaths = await glob(`${globPath}*(*.js|*.ts)`);
+      } else {
+        const tsModulePaths = await glob(`${globPath}*.ts`);
+        const jsModulePaths = await glob(`${globPath}*.js`);
+        const pathMap: Record<string, true> = {};
+
+        for (const tsPath of tsModulePaths) {
+          pathMap[tsPath.slice(0, -3)] = true;
+        }
+
+        modulePaths = [...tsModulePaths];
+
+        for (const jsPath of jsModulePaths) {
+          if (!pathMap[jsPath.slice(0, -3)]) {
+            modulePaths.push(jsPath);
+          }
+        }
+      }
+    } else {
+      modulePaths = await glob(`${globPath}*.js`);
+    }
+
+    return modulePaths;
   }
 }
