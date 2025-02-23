@@ -57,7 +57,7 @@ jobs:
           command: |
             EXPECTED_MINOR=$(if [[ $ISSUE_TYPE == enhancement ]]; then echo $((MINOR+1)); else echo $MINOR; fi)
             EXPECTED_PATCH=$(if [[ $ISSUE_TYPE == bug ]]; then echo $((PATCH+1)); else echo 0; fi)
-            EXPECTED_VERSION=$MAJOR.$EXPECTED_MINOR.$EXPECTED_PATCH
+            EXPECTED_VERSION=$MAIN_MAJOR.$EXPECTED_MINOR.$EXPECTED_PATCH
             echo export EXPECTED_VERSION=$EXPECTED_VERSION >> $BASH_ENV
       - run:
           name: Print expected version
