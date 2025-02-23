@@ -77,8 +77,9 @@ jobs:
     executor: node/default
     steps:
       - checkout
-      - node/install-packages:
-          pkg-manager: npm
+      - run:
+          name: NPM install
+          command: npm ci
       - run:
           name: Transpile TypeScript
           command: npm run build
@@ -98,8 +99,6 @@ jobs:
       - checkout
       - attach_workspace:
           at: .
-      - run:
-          command: npm install jest-junit
       - run:
           name: Run tests
           command: npm run test --ci --runInBand --reporters=default --reporters=jest-junit
