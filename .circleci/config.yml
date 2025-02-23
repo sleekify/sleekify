@@ -158,7 +158,7 @@ jobs:
           name: NPM publish
           command: |
             npm set //registry.npmjs.org/:_authToken=$NPM_TOKEN
-            npm publish --access public --dry-run  
+            npm publish --access public
 workflows:
   Check Version:
     when:
