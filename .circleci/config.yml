@@ -3,6 +3,65 @@ orbs:
   node: circleci/node@5
   win: circleci/windows@5.0
 jobs:
+  Check Version:
+    executor: node/default
+    steps:
+      - checkout
+      - run:
+          name: Get current version
+          command: |
+            MAIN_VERSION=$(curl https://raw.githubusercontent.com/sleekify/sleekify/refs/heads/main/package.json | grep version | sed 's/[ \t]*"version":[ \t]*"\([0-9]\+[.][0-9]\+[.][0-9]\+\)",/\1/g')
+            MAIN_MAJOR=$(echo $MAIN_VERSION | sed 's/\([0-9]\+\)[.][0-9]\+[.][0-9]\+/\1/g')
+            MAIN_MINOR=$(echo $MAIN_VERSION | sed 's/[0-9]\+[.]\([0-9]\+\)[.][0-9]\+/\1/g')
+            MAIN_PATCH=$(echo $MAIN_VERSION | sed 's/[0-9]\+[.][0-9]\+[.]\([0-9]\+\)/\1/g')
+            echo export MAIN_VERSION=$VERSION >> $BASH_ENV
+            echo export MAIN_MAJOR=$MAIN_MAJOR >> $BASH_ENV
+            echo export MAIN_MINOR=$MAIN_MINOR >> $BASH_ENV
+            echo export MAIN_PATCH=$MAIN_PATCH >> $BASH_ENV
+      - run:
+          name: Got current version
+          command: test "$MAIN_VERSION" != ""
+      - run:
+          name: Get package version
+          command: |
+            PACKAGE_VERSION=$(jq -r '.version' package.json | sed 's/[ \t]*"version":[ \t]*"\([0-9]\+[.][0-9]\+[.][0-9]\+\)",/\1/g')
+            PACKAGE_LOCK_VERSION=$(jq -r '.version' package-lock.json | sed 's/[ \t]*"version":[ \t]*"\([0-9]\+[.][0-9]\+[.][0-9]\+\)",/\1/g')
+            PACKAGE_LOCK_VERSION_2=$(jq -r '.packages."".version' package-lock.json | sed 's/[ \t]*"version":[ \t]*"\([0-9]\+[.][0-9]\+[.][0-9]\+\)",/\1/g')
+            echo export PACKAGE_VERSION=$PACKAGE_VERSION >> $BASH_ENV
+            echo export PACKAGE_LOCK_VERSION=$PACKAGE_LOCK_VERSION >> $BASH_ENV
+            echo export PACKAGE_LOCK_VERSION_2=$PACKAGE_LOCK_VERSION_2 >> $BASH_ENV
+      - run:
+          name: Got package version
+          command: test "$PACKAGE_VERSION" != "" && test "$PACKAGE_LOCK_VERSION" != "" && test "$PACKAGE_LOCK_VERSION_2" != ""
+      - run:
+          name: Get issue ID
+          command: |
+            ISSUE_ID=$(echo $CIRCLE_BRANCH | sed 's/\([0-9]\+\).*/\1/g')
+            echo export ISSUE_ID=$ISSUE_ID >> $BASH_ENV
+      - run:
+          name: Verify Branch Name Starts With Issue ID
+          command: test "$ISSUE_ID" != ""
+      - run:
+          name: Get issue type
+          command: |
+            ISSUE_TYPE=$(curl https://api.github.com/repos/sleekify/$CIRCLE_PROJECT_REPONAME/issues/$ISSUE_ID/labels | jq -r '.[0].name')
+            echo export ISSUE_TYPE=$ISSUE_TYPE >> $BASH_ENV
+      - run:
+          name: Got issue type
+          command: test "$ISSUE_TYPE" == "enhancement" || test "$ISSUE_TYPE" == "bug"
+      - run:
+          name: Get expected version
+          command: |
+            EXPECTED_MINOR=$(if [[ $ISSUE_TYPE == enhancement ]]; then echo $((MINOR+1)); else echo $MINOR; fi)
+            EXPECTED_PATCH=$(if [[ $ISSUE_TYPE == bug ]]; then echo $((PATCH+1)); else echo 0; fi)
+            EXPECTED_VERSION=$MAJOR.$EXPECTED_MINOR.$EXPECTED_PATCH
+            echo export EXPECTED_VERSION=$EXPECTED_VERSION >> $BASH_ENV
+      - run:
+          name: Verify package.json version is correct
+          command: test "$PACKAGE_VERSION" == "$EXPECTED_VERSION"
+      - run:
+          name: Verify package-lock.json versions are correct
+          command: test "$PACKAGE_LOCK_VERSION" == "$EXPECTED_VERSION" && test "$PACKAGE_LOCK_VERSION_2" == "$EXPECTED_VERSION"
   Build Linux:
     executor: node/default
     steps:
@@ -42,7 +101,7 @@ jobs:
     steps:
       - checkout
       - run:
-          name: NVM Install
+          name: NVM install
           command: nvm install
       - node/install-packages:
           pkg-manager: npm
@@ -64,7 +123,7 @@ jobs:
     steps:
       - checkout
       - run:
-          name: NVM Install
+          name: NVM install
           command: nvm install
       - attach_workspace:
           at: .
@@ -77,15 +136,22 @@ jobs:
           path: ./test-results/
 workflows:
   Validate Code (Linux):
+    when:
+      not: 
+        equal: [ << pipeline.git.branch >>, main ]
     jobs:
       - Build Linux
       - Test Linux:
           requires: 
             - Build Linux
   Validate Code (Windows):
+    when:
+      not: 
+        equal: [ << pipeline.git.branch >>, main ]
     jobs:
       - Build Windows
       - Test Windows:
           requires: 
             - Build Windows
+    
     
