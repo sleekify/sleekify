@@ -72,7 +72,7 @@ jobs:
       - run:
           name: Test NPM publish
           command: |
-            npm publish --access public --dry-run
+            npm publish --access public --dry-run        
   Build Linux:
     executor: node/default
     steps:
@@ -145,6 +145,24 @@ jobs:
           command: npm run test --ci --runInBand --reporters=default --reporters=jest-junit
       - store_test_results:
           path: ./test-results/
+  Publish:
+    executor: node/default
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: Transpile TypeScript
+          command: npm run build
+      - run:
+          name: NPM token is protected
+          command: |
+            echo NPM_TOKEN: $NPM_TOKEN
+      - run:
+          name: NPM publish
+          command: |
+            npm set //registry.npmjs.org/:_authToken=$NPM_TOKEN
+            npm publish --access public --dry-run  
 workflows:
   Check Version:
     when:
@@ -152,6 +170,14 @@ workflows:
         equal: [ << pipeline.git.branch >>, main ]
     jobs:
       - Check Version
+  Publish:
+    when:
+      not: 
+        equal: [ << pipeline.git.branch >>, main ]
+    jobs:
+      - Publish:
+          context:
+            - NPM
   Validate Code (Linux):
     when:
       not: 
