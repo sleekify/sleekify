@@ -69,6 +69,10 @@ jobs:
       - run:
           name: Verify package-lock.json versions are correct
           command: test "$PACKAGE_LOCK_VERSION_1" == "$EXPECTED_VERSION" && test "$PACKAGE_LOCK_VERSION_2" == "$EXPECTED_VERSION"
+      - run:
+          name: Test NPM publish
+          command: |
+            npm publish --access public --dry-run
   Build Linux:
     executor: node/default
     steps:
