@@ -74,6 +74,6 @@ export class PathUtil {
       modulePaths = await glob(`${globPath}*.js`);
     }
 
-    return modulePaths;
+    return modulePaths.sort();
   }
 }
