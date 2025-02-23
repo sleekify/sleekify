@@ -140,7 +140,10 @@ workflows:
       not: 
         equal: [ << pipeline.git.branch >>, main ]
     jobs:
-      - Build Linux
+      - Check Version
+      - Build Linux:
+          requires:
+            - Check Version
       - Test Linux:
           requires: 
             - Build Linux
