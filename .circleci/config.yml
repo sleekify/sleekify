@@ -77,9 +77,8 @@ jobs:
     executor: node/default
     steps:
       - checkout
-      - run:
-          name: NPM install
-          command: npm ci
+      - node/install-packages:
+          pkg-manager: npm
       - run:
           name: Transpile TypeScript
           command: npm run build
