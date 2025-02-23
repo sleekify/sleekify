@@ -22,16 +22,13 @@ jobs:
           name: Got current version
           command: test "$MAIN_VERSION" != ""
       - run:
-          name: Print current version
-          command: echo $MAIN_VERSION
-      - run:
           name: Get package version
           command: |
             PACKAGE_VERSION=$(jq -r '.version' package.json)
             PACKAGE_LOCK_VERSION=$(jq -r '.version' package-lock.json)
             PACKAGE_LOCK_VERSION_2=$(jq -r '.packages."".version' package-lock.json)
             echo export PACKAGE_VERSION=$PACKAGE_VERSION >> $BASH_ENV
-            echo export PACKAGE_LOCK_VERSION=$PACKAGE_LOCK_VERSION >> $BASH_ENV
+            echo export PACKAGE_LOCK_VERSION_1=$PACKAGE_LOCK_VERSION >> $BASH_ENV
             echo export PACKAGE_LOCK_VERSION_2=$PACKAGE_LOCK_VERSION_2 >> $BASH_ENV
       - run:
           name: Got package version
@@ -60,14 +57,19 @@ jobs:
             EXPECTED_VERSION=$MAIN_MAJOR.$EXPECTED_MINOR.$EXPECTED_PATCH
             echo export EXPECTED_VERSION=$EXPECTED_VERSION >> $BASH_ENV
       - run:
-          name: Print expected version
-          command: echo $EXPECTED_VERSION
+          name: Print versions
+          command: |
+            echo MAIN_VERSION: $MAIN_VERSION
+            echo EXPECTED_VERSION: $EXPECTED_VERSION
+            echo PACKAGE_VERSION: $PACKAGE_VERSION
+            echo PACKAGE_LOCK_VERSION_1: $PACKAGE_LOCK_VERSION_1
+            echo PACKAGE_LOCK_VERSION_2: $PACKAGE_LOCK_VERSION_2
       - run:
           name: Verify package.json version is correct
           command: test "$PACKAGE_VERSION" == "$EXPECTED_VERSION"
       - run:
           name: Verify package-lock.json versions are correct
-          command: test "$PACKAGE_LOCK_VERSION" == "$EXPECTED_VERSION" && test "$PACKAGE_LOCK_VERSION_2" == "$EXPECTED_VERSION"
+          command: test "$PACKAGE_LOCK_VERSION_1" == "$EXPECTED_VERSION" && test "$PACKAGE_LOCK_VERSION_2" == "$EXPECTED_VERSION"
   Build Linux:
     executor: node/default
     steps:
