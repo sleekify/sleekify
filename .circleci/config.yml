@@ -56,6 +56,8 @@ jobs:
       - run:
           name: Print versions
           command: |
+            echo ISSUE_ID: $ISSUE_ID
+            echo ISSUE_TYPE: $ISSUE_TYPE
             echo MAIN_VERSION: $MAIN_VERSION
             echo EXPECTED_VERSION: $EXPECTED_VERSION
             echo PACKAGE_VERSION: $PACKAGE_VERSION
