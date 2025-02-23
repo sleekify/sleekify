@@ -168,10 +168,11 @@ workflows:
       - Check Version
   Publish:
     when:
-      not: 
-        equal: [ << pipeline.git.branch >>, main ]
+      equal: [ << pipeline.git.branch >>, main ]
     jobs:
-      - Publish
+      - Publish:
+          context:
+            - NPM
   Validate Code (Linux):
     when:
       not: 
