@@ -26,7 +26,7 @@ jobs:
           name: Get package version
           command: |
             PACKAGE_VERSION=$(jq -r '.version' package.json)
-            PACKAGE_LOCK_VERSION=$(jq -r '.version' package-lock.json)
+            PACKAGE_LOCK_VERSION_1=$(jq -r '.version' package-lock.json)
             PACKAGE_LOCK_VERSION_2=$(jq -r '.packages."".version' package-lock.json)
             test "$PACKAGE_VERSION" != ""
             test "$PACKAGE_LOCK_VERSION_1" != ""
