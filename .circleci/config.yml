@@ -143,15 +143,18 @@ jobs:
       - store_test_results:
           path: ./test-results/
 workflows:
-  Validate Code (Linux):
+  Check Version:
     when:
       not: 
         equal: [ << pipeline.git.branch >>, main ]
     jobs:
       - Check Version
-      - Build Linux:
-          requires:
-            - Check Version
+  Validate Code (Linux):
+    when:
+      not: 
+        equal: [ << pipeline.git.branch >>, main ]
+    jobs:
+      - Build Linux
       - Test Linux:
           requires: 
             - Build Linux
