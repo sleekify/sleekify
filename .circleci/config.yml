@@ -10,7 +10,7 @@ jobs:
       - run:
           name: Get current version
           command: |
-            MAIN_VERSION=$(curl https://raw.githubusercontent.com/sleekify/sleekify/refs/heads/main/package.json | grep version | sed 's/[ \t]*"version":[ \t]*"\([0-9]\+[.][0-9]\+[.][0-9]\+\)",/\1/g')
+            MAIN_VERSION=$(curl https://raw.githubusercontent.com/sleekify/sleekify/refs/heads/main/package.json | jq -r '.version')
             MAIN_MAJOR=$(echo $MAIN_VERSION | sed 's/\([0-9]\+\)[.][0-9]\+[.][0-9]\+/\1/g')
             MAIN_MINOR=$(echo $MAIN_VERSION | sed 's/[0-9]\+[.]\([0-9]\+\)[.][0-9]\+/\1/g')
             MAIN_PATCH=$(echo $MAIN_VERSION | sed 's/[0-9]\+[.][0-9]\+[.]\([0-9]\+\)/\1/g')
@@ -24,9 +24,9 @@ jobs:
       - run:
           name: Get package version
           command: |
-            PACKAGE_VERSION=$(jq -r '.version' package.json | sed 's/[ \t]*"version":[ \t]*"\([0-9]\+[.][0-9]\+[.][0-9]\+\)",/\1/g')
-            PACKAGE_LOCK_VERSION=$(jq -r '.version' package-lock.json | sed 's/[ \t]*"version":[ \t]*"\([0-9]\+[.][0-9]\+[.][0-9]\+\)",/\1/g')
-            PACKAGE_LOCK_VERSION_2=$(jq -r '.packages."".version' package-lock.json | sed 's/[ \t]*"version":[ \t]*"\([0-9]\+[.][0-9]\+[.][0-9]\+\)",/\1/g')
+            PACKAGE_VERSION=$(jq -r '.version' package.json)
+            PACKAGE_LOCK_VERSION=$(jq -r '.version' package-lock.json)
+            PACKAGE_LOCK_VERSION_2=$(jq -r '.packages."".version' package-lock.json)
             echo export PACKAGE_VERSION=$PACKAGE_VERSION >> $BASH_ENV
             echo export PACKAGE_LOCK_VERSION=$PACKAGE_LOCK_VERSION >> $BASH_ENV
             echo export PACKAGE_LOCK_VERSION_2=$PACKAGE_LOCK_VERSION_2 >> $BASH_ENV
