@@ -32,7 +32,7 @@ jobs:
             echo export PACKAGE_LOCK_VERSION_2=$PACKAGE_LOCK_VERSION_2 >> $BASH_ENV
       - run:
           name: Got package version
-          command: test "$PACKAGE_VERSION" != "" && test "$PACKAGE_LOCK_VERSION" != "" && test "$PACKAGE_LOCK_VERSION_2" != ""
+          command: test "$PACKAGE_VERSION" != "" && test "$PACKAGE_LOCK_VERSION_1" != "" && test "$PACKAGE_LOCK_VERSION_2" != ""
       - run:
           name: Get issue ID
           command: |
