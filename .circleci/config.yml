@@ -14,7 +14,7 @@ jobs:
             MAIN_MAJOR=$(echo $MAIN_VERSION | sed 's/\([0-9]\+\)[.][0-9]\+[.][0-9]\+/\1/g')
             MAIN_MINOR=$(echo $MAIN_VERSION | sed 's/[0-9]\+[.]\([0-9]\+\)[.][0-9]\+/\1/g')
             MAIN_PATCH=$(echo $MAIN_VERSION | sed 's/[0-9]\+[.][0-9]\+[.]\([0-9]\+\)/\1/g')
-            echo export MAIN_VERSION=$VERSION >> $BASH_ENV
+            echo export MAIN_VERSION=$MAIN_VERSION >> $BASH_ENV
             echo export MAIN_MAJOR=$MAIN_MAJOR >> $BASH_ENV
             echo export MAIN_MINOR=$MAIN_MINOR >> $BASH_ENV
             echo export MAIN_PATCH=$MAIN_PATCH >> $BASH_ENV
