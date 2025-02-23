@@ -141,8 +141,6 @@ jobs:
       - attach_workspace:
           at: .
       - run:
-          command: npm install jest-junit
-      - run:
           name: Run tests
           command: npm run test --ci --runInBand --reporters=default --reporters=jest-junit
       - run:
