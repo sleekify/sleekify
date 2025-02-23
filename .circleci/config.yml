@@ -57,6 +57,9 @@ jobs:
             EXPECTED_VERSION=$MAJOR.$EXPECTED_MINOR.$EXPECTED_PATCH
             echo export EXPECTED_VERSION=$EXPECTED_VERSION >> $BASH_ENV
       - run:
+          name: Print expected version
+          command: echo $EXPECTED_VERSION
+      - run:
           name: Verify package.json version is correct
           command: test "$PACKAGE_VERSION" == "$EXPECTED_VERSION"
       - run:
