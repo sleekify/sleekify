@@ -32,7 +32,7 @@ jobs:
             test "$PACKAGE_LOCK_VERSION_1" != ""
             test "$PACKAGE_LOCK_VERSION_2" != ""
             echo export PACKAGE_VERSION=$PACKAGE_VERSION >> $BASH_ENV
-            echo export PACKAGE_LOCK_VERSION_1=$PACKAGE_LOCK_VERSION >> $BASH_ENV
+            echo export PACKAGE_LOCK_VERSION_1=$PACKAGE_LOCK_VERSION_1 >> $BASH_ENV
             echo export PACKAGE_LOCK_VERSION_2=$PACKAGE_LOCK_VERSION_2 >> $BASH_ENV 
       - run:
           name: Verify branch name starts with issue ID
@@ -49,8 +49,8 @@ jobs:
       - run:
           name: Get expected version
           command: |
-            EXPECTED_MINOR=$(if [[ $ISSUE_TYPE == enhancement ]]; then echo $((MINOR+1)); else echo $MINOR; fi)
-            EXPECTED_PATCH=$(if [[ $ISSUE_TYPE == bug ]]; then echo $((PATCH+1)); else echo 0; fi)
+            EXPECTED_MINOR=$(if [[ $ISSUE_TYPE == enhancement ]]; then echo $((MAIN_MINOR+1)); else echo $MAIN_MINOR; fi)
+            EXPECTED_PATCH=$(if [[ $ISSUE_TYPE == bug ]]; then echo $((MAIN_PATCH+1)); else echo 0; fi)
             EXPECTED_VERSION=$MAIN_MAJOR.$EXPECTED_MINOR.$EXPECTED_PATCH
             echo export EXPECTED_VERSION=$EXPECTED_VERSION >> $BASH_ENV
       - run:
