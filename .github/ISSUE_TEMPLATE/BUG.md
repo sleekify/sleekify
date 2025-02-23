@@ -20,4 +20,4 @@ assignees: ''
 (Additional notes)
 
 ### Out of Scope
-(Omitted work which may be considered for follow-up issues)
+(Omitted work which may be considered for future efforts)
