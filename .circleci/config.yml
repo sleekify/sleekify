@@ -155,10 +155,21 @@ jobs:
           name: Transpile TypeScript
           command: npm run build
       - run:
+          name: Get package version
+          command: |
+            PACKAGE_VERSION=$(jq -r '.version' package.json)
+            test "$PACKAGE_VERSION" != ""
+            echo export PACKAGE_VERSION=$PACKAGE_VERSION >> $BASH_ENV
+      - run:
           name: NPM publish
           command: |
             npm set //registry.npmjs.org/:_authToken=$NPM_TOKEN
             npm publish --access public
+      - run:
+          name: Tag release
+          command: |
+            git tag "v$PACKAGE_VERSION"
+            git push origin --tags
 workflows:
   Check Version:
     when:
@@ -172,6 +183,7 @@ workflows:
     jobs:
       - Publish:
           context:
+            - GITHUB
             - NPM
   Validate Code (Linux):
     when:
