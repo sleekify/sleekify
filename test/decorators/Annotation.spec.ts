@@ -489,7 +489,7 @@ describe('Annotation', () => {
   it('When searching for inline JavaScript classes, then the classes are found', async () => {
     const examplePath = `examples${path.sep}typescript${path.sep}inline`;
 
-    execSyncWithOutput(`cd ${examplePath} && npm install`);
+    execSyncWithOutput(`cd ${examplePath} && npm ci --prefer-offline`);
     execSyncWithOutput(`cd ${examplePath} && npm run build`);
 
     let output = execSync(`cd ${examplePath} && node src${path.sep}index.js`);
@@ -504,7 +504,7 @@ describe('Annotation', () => {
   it('When searching for JavaScript classes in outDir, then the classes are found', async () => {
     const examplePath = `examples${path.sep}typescript${path.sep}separate`;
 
-    execSyncWithOutput(`cd ${examplePath} && npm install`);
+    execSyncWithOutput(`cd ${examplePath} && npm ci --prefer-offline`);
     execSyncWithOutput(`cd ${examplePath} && npm run build`);
 
     let output = execSync(`cd ${examplePath} && node dist${path.sep}src${path.sep}index.js`);

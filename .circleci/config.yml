@@ -103,6 +103,9 @@ jobs:
       - run:
           name: Run tests
           command: npm run test --ci --runInBand --reporters=default --reporters=jest-junit
+      - run:
+          name: Check git status
+          command: git diff --exit-code
       - store_test_results:
           path: ./test-results/
   Build Windows:
@@ -143,6 +146,9 @@ jobs:
       - run:
           name: Run tests
           command: npm run test --ci --runInBand --reporters=default --reporters=jest-junit
+      - run:
+          name: Check git status
+          command: git diff --exit-code
       - store_test_results:
           path: ./test-results/
   Publish:
