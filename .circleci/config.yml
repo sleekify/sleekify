@@ -14,41 +14,38 @@ jobs:
             MAIN_MAJOR=$(echo $MAIN_VERSION | sed 's/\([0-9]\+\)[.][0-9]\+[.][0-9]\+/\1/g')
             MAIN_MINOR=$(echo $MAIN_VERSION | sed 's/[0-9]\+[.]\([0-9]\+\)[.][0-9]\+/\1/g')
             MAIN_PATCH=$(echo $MAIN_VERSION | sed 's/[0-9]\+[.][0-9]\+[.]\([0-9]\+\)/\1/g')
+            test "$MAIN_VERSION" != ""
+            test "$MAIN_MAJOR" != ""
+            test "$MAIN_MINOR" != ""
+            test "$MAIN_PATCH" != ""
             echo export MAIN_VERSION=$MAIN_VERSION >> $BASH_ENV
             echo export MAIN_MAJOR=$MAIN_MAJOR >> $BASH_ENV
             echo export MAIN_MINOR=$MAIN_MINOR >> $BASH_ENV
             echo export MAIN_PATCH=$MAIN_PATCH >> $BASH_ENV
-      - run:
-          name: Got current version
-          command: test "$MAIN_VERSION" != ""
       - run:
           name: Get package version
           command: |
             PACKAGE_VERSION=$(jq -r '.version' package.json)
             PACKAGE_LOCK_VERSION=$(jq -r '.version' package-lock.json)
             PACKAGE_LOCK_VERSION_2=$(jq -r '.packages."".version' package-lock.json)
+            test "$PACKAGE_VERSION" != ""
+            test "$PACKAGE_LOCK_VERSION_1" != ""
+            test "$PACKAGE_LOCK_VERSION_2" != ""
             echo export PACKAGE_VERSION=$PACKAGE_VERSION >> $BASH_ENV
             echo export PACKAGE_LOCK_VERSION_1=$PACKAGE_LOCK_VERSION >> $BASH_ENV
-            echo export PACKAGE_LOCK_VERSION_2=$PACKAGE_LOCK_VERSION_2 >> $BASH_ENV
+            echo export PACKAGE_LOCK_VERSION_2=$PACKAGE_LOCK_VERSION_2 >> $BASH_ENV 
       - run:
-          name: Got package version
-          command: test "$PACKAGE_VERSION" != "" && test "$PACKAGE_LOCK_VERSION_1" != "" && test "$PACKAGE_LOCK_VERSION_2" != ""
-      - run:
-          name: Get issue ID
+          name: Verify branch name starts with issue ID
           command: |
             ISSUE_ID=$(echo $CIRCLE_BRANCH | sed 's/\([0-9]\+\).*/\1/g')
+            test "$ISSUE_ID" != ""
             echo export ISSUE_ID=$ISSUE_ID >> $BASH_ENV
-      - run:
-          name: Verify Branch Name Starts With Issue ID
-          command: test "$ISSUE_ID" != ""
       - run:
           name: Get issue type
           command: |
             ISSUE_TYPE=$(curl https://api.github.com/repos/sleekify/$CIRCLE_PROJECT_REPONAME/issues/$ISSUE_ID/labels | jq -r '.[0].name')
-            echo export ISSUE_TYPE=$ISSUE_TYPE >> $BASH_ENV
-      - run:
-          name: Got issue type
-          command: test "$ISSUE_TYPE" == "enhancement" || test "$ISSUE_TYPE" == "bug"
+            test "$ISSUE_TYPE" == "enhancement" || test "$ISSUE_TYPE" == "bug"
+            echo export ISSUE_TYPE=$ISSUE_TYPE >> $
       - run:
           name: Get expected version
           command: |
