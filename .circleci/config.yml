@@ -155,10 +155,6 @@ jobs:
           name: Transpile TypeScript
           command: npm run build
       - run:
-          name: NPM token is protected
-          command: |
-            echo NPM_TOKEN: $NPM_TOKEN
-      - run:
           name: NPM publish
           command: |
             npm set //registry.npmjs.org/:_authToken=$NPM_TOKEN
@@ -175,9 +171,7 @@ workflows:
       not: 
         equal: [ << pipeline.git.branch >>, main ]
     jobs:
-      - Publish:
-          context:
-            - NPM
+      - Publish
   Validate Code (Linux):
     when:
       not: 
