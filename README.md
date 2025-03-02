@@ -26,12 +26,12 @@ Follow the instructions provided by each integration:
 export class UsersIdResource {
   @GET()
   async getMany () {
-    // TODO: your read user code here
+    // TODO: your read user code here!
   }
 
   @POST()
   async createOne () {
-    // TODO: your create user code here
+    // TODO: your create user code here!
   }
 }
 ```
