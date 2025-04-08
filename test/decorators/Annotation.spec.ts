@@ -90,19 +90,19 @@ describe('Annotation', () => {
       {
         description: 'decorator',
         decorator,
-        isInerited: true,
+        isInherited: true,
         isAdditive: true
       },
       {
-        description: 'non-inhertied decorator',
+        description: 'non-inherited decorator',
         decorator: notInheritedDecorator,
-        isInerited: false,
+        isInherited: false,
         isAdditive: true
       },
       {
         description: 'non-additive decorator',
         decorator: notAdditiveDecorator,
-        isInerited: true,
+        isInherited: true,
         isAdditive: false
       }
     ].forEach(test => {
@@ -127,7 +127,7 @@ describe('Annotation', () => {
         expect(Annotation.get(TargetClass, undefined, test.decorator)).toStrictEqual(value.value1);
       });
 
-      if (test.isInerited) {
+      if (test.isInherited) {
         it(`When ${value.description} ${test.description} is applied to a parent class, the annotation can be read`, () => {
           @test.decorator(value.value1)
           class ParentClass {
@@ -165,7 +165,7 @@ describe('Annotation', () => {
         });
       }
 
-      if (test.isInerited && test.isAdditive && _.isObject(value.value1) && _.isObject(value.value2)) {
+      if (test.isInherited && test.isAdditive && _.isObject(value.value1) && _.isObject(value.value2)) {
         it(`When ${value.description} ${test.description} is applied to a child and parent class, the annotation values are merged`, () => {
           @test.decorator(value.value1)
           class ParentClass {
@@ -250,7 +250,7 @@ describe('Annotation', () => {
         expect(Annotation.get(TargetClass, 'targetMethod', test.decorator)).toStrictEqual(value.value1);
       });
 
-      if (test.isInerited) {
+      if (test.isInherited) {
         it(`When ${value.description} ${test.description} is applied to a parent class method, the annotation can be read`, () => {
           class ParentClass {
             @test.decorator(value.value1)
@@ -288,7 +288,7 @@ describe('Annotation', () => {
         });
       }
 
-      if (test.isInerited && test.isAdditive && _.isObject(value.value1) && _.isObject(value.value2)) {
+      if (test.isInherited && test.isAdditive && _.isObject(value.value1) && _.isObject(value.value2)) {
         it(`When ${value.description} ${test.description} is applied to a child and parent class method, the annotation values are merged`, () => {
           class ParentClass {
             @test.decorator(value.value1)
@@ -352,7 +352,7 @@ describe('Annotation', () => {
         expect(Annotation.get(TargetClass, 'targetMethod', test.decorator)).toStrictEqual(value.value1);
       });
 
-      if (test.isInerited) {
+      if (test.isInherited) {
         it(`When ${value.description} ${test.description} is applied to a parent static class method, the annotation can be read`, () => {
           class ParentClass {
             @test.decorator(value.value1)
@@ -390,7 +390,7 @@ describe('Annotation', () => {
         });
       }
 
-      if (test.isInerited && test.isAdditive && _.isObject(value.value1) && _.isObject(value.value2)) {
+      if (test.isInherited && test.isAdditive && _.isObject(value.value1) && _.isObject(value.value2)) {
         it(`When ${value.description} ${test.description} is applied to a child and parent static class method, the annotation values are merged`, () => {
           class ParentClass {
             @test.decorator(value.value1)
