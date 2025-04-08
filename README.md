@@ -100,9 +100,9 @@ export abstract class AbstractSingleResource {
 ```
 
 Your base classes can provide all of the common documentation, while your subclasses may be more specialized for each individual resource.
-This pattern works since REST APIs usually follow a consistent interface.
-The values you provide for the decorators are additive which allows you add or replace properties in the OpenAPI definitions.
-If you ever need to remove a property from an OpenAPI definition, then you will need to define a new base class.
+This pattern works because REST APIs usually follow a consistent interface.
+The values you provide for the decorators are additive allowing you to add or replace properties in the OpenAPI definitions.
+If you ever need to remove a property from an OpenAPI definition, you must define a new base class without that property.
 
 <sub>_src/v1/users.ts_</sub>
 ```TypeScript
@@ -194,7 +194,7 @@ This utility allows you to search for classes which have an Sleekify decorator o
 ### Web Application Errors
 
 These web application errors are provided since throwing errors is the best approach for generating error responses.
-It prevents HTTP concerns from leaking into other application layers and allows you to take advantage of error chaining via the error `cause` property.
+This prevents HTTP concerns from leaking into other application layers and allows you to take advantage of error chaining via the error `cause` property.
 You may define your own error handler to serialize errors into error responses which keeps error formatting in a single code location.
 
 #### Client Errors
@@ -207,7 +207,7 @@ You may define your own error handler to serialize errors into error responses w
 | ForbiddenError | 403 | Indicates that an authenticated client is not authorized |
 | NotFoundError | 404 | The resource was not found |
 | MethodNotAllowedError | 405 | The resource does not support the given HTTP method |
-| NotAcceptableError | 406 | The resource doesn't produce requested media type |
+| NotAcceptableError | 406 | The resource doesn't produce the requested media type |
 | ProxyAuthenticationRequiredError | 407 | |
 | RequestTimeoutError | 408 | The server timed out during the request |
 | ConflictError | 409 | Indicates that the server detected an edit conflict |
@@ -216,7 +216,7 @@ You may define your own error handler to serialize errors into error responses w
 | PreconditionFailedError | 412 | Indicates an `If-Match` conflict for servers which support `ETag` headers |
 | PayloadTooLargeError | 413 | |
 | URITooLongError | 414 | |
-| UnsupportedMediaTypeError | 415 | The resource doesn't consume requested media type |
+| UnsupportedMediaTypeError | 415 | The resource doesn't consume the requested media type |
 | RangeNotSatisfiableError | 416 | |
 | ExpectationFailedError | 417 | |
 | IAmATeapotError | 418 | |
