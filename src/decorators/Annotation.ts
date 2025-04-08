@@ -100,7 +100,9 @@ export class Annotation {
     const objectValue = {};
 
     for (const value of valueList) {
-      _.defaultsDeep(objectValue, value);
+      if (_.isObject(value)) {
+        _.defaultsDeep(objectValue, value);
+      }
 
       if (!isAdditive) {
         break;
@@ -122,7 +124,7 @@ export class Annotation {
     const callerFilename = PathUtil.getCallerFilename();
     const callerDirectory = PathUtil.filenameToDirectory(callerFilename);
     const currentDir = process.cwd();
-    const tsConfigPath = `${currentDir}${path.sep}tsconfig.json`;
+    const tsConfigPath = path.join(currentDir, 'tsconfig.json');
     let isTypeScript = false;
     let hasTypesScriptOutDir = false;
 
@@ -248,6 +250,8 @@ export class Annotation {
 
       return classReference.$annotations[classKey][propertyKey];
     }
+
+    return undefined;
   }
 
   private static getClassKey (target: any): number {
@@ -256,13 +260,13 @@ export class Annotation {
 
   private static getValueForClass (target: any, decoratorKey: string): any {
     if (undefined === target.$annotations) {
-      return;
+      return undefined;
     }
 
     const classKey = this.getClassKey(target);
 
     if (undefined === target.$annotations[classKey]) {
-      return;
+      return undefined;
     }
 
     return target.$annotations[classKey][decoratorKey];
@@ -288,17 +292,17 @@ export class Annotation {
 
   private static getValueForProperty (target: any, propertyKey: string, decoratorKey: string): any {
     if (undefined === target.$annotations) {
-      return;
+      return undefined;
     }
 
     const classKey = this.getClassKey(target);
 
     if (undefined === target.$annotations[classKey]) {
-      return;
+      return undefined;
     }
 
     if (undefined === target.$annotations[classKey][propertyKey]) {
-      return;
+      return undefined;
     }
 
     return target.$annotations[classKey][propertyKey][decoratorKey];
@@ -314,8 +318,7 @@ export class Annotation {
       /* static property annotation */
       isProperty = true;
     } else {
-      const prototype = (target).prototype;
-      const instanceTargetValue: any = (prototype)[propertyKey];
+      const instanceTargetValue: any = target.prototype?.[propertyKey];
 
       if (_.isFunction(instanceTargetValue)) {
         /* property annotation */
@@ -357,7 +360,7 @@ export class Annotation {
         for (const exportName in module) {
           const exportValue = module[exportName];
 
-          if (_.isObject(module)) {
+          if (_.isObject(exportValue)) {
             if (Annotation.exists(exportValue, undefined, decorator)) {
               classArray.push(exportValue);
             }
