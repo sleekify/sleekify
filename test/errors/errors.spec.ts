@@ -193,12 +193,14 @@ describe('errors', () => {
       it(`${test.error.name} has status code ${test.status}`, () => {
         // When
         const ErrorConstructor = test.error;
-        const error = new ErrorConstructor('message');
+        const cause = new Error();
+        const error = new ErrorConstructor('message', { cause });
 
         // Then
         expect(error.message).toBe('message');
         expect(error.status).toBe(test.status);
         expect(error.reason).toBe(test.reason);
+        expect(error.cause).toStrictEqual(cause);
       });
     });
   });
@@ -264,12 +266,14 @@ describe('errors', () => {
       it(`${test.error.name} has status code ${test.status}`, () => {
         // When
         const ErrorConstructor = test.error;
-        const error = new ErrorConstructor('message');
+        const cause = new Error();
+        const error = new ErrorConstructor('message', { cause });
 
         // Then
         expect(error.message).toBe('message');
         expect(error.status).toBe(test.status);
         expect(error.reason).toBe(test.reason);
+        expect(error.cause).toStrictEqual(cause);
       });
     });
   });
