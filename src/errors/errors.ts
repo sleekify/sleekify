@@ -1,4 +1,4 @@
-export interface ErrorOptions { cause?: Error };
+export interface ErrorOptions { cause?: unknown };
 
 /**
  * The base class for all HTTP errors.
@@ -45,7 +45,7 @@ export class ClientWebApplicationError extends WebApplicationError {
  */
 export class BadRequestError extends ClientWebApplicationError {
   constructor (message?: string, options?: ErrorOptions) {
-    super(400, message);
+    super(400, message, options);
   }
 }
 
@@ -57,7 +57,7 @@ export class BadRequestError extends ClientWebApplicationError {
  */
 export class UnauthorizedError extends ClientWebApplicationError {
   constructor (message?: string, options?: ErrorOptions) {
-    super(401, message);
+    super(401, message, options);
   }
 }
 
@@ -69,7 +69,7 @@ export class UnauthorizedError extends ClientWebApplicationError {
  */
 export class PaymentRequiredError extends ClientWebApplicationError {
   constructor (message?: string, options?: ErrorOptions) {
-    super(402, message);
+    super(402, message, options);
   }
 }
 
@@ -81,7 +81,7 @@ export class PaymentRequiredError extends ClientWebApplicationError {
  */
 export class ForbiddenError extends ClientWebApplicationError {
   constructor (message?: string, options?: ErrorOptions) {
-    super(403, message);
+    super(403, message, options);
   }
 }
 
@@ -91,7 +91,7 @@ export class ForbiddenError extends ClientWebApplicationError {
  */
 export class NotFoundError extends ClientWebApplicationError {
   constructor (message?: string, options?: ErrorOptions) {
-    super(404, message);
+    super(404, message, options);
   }
 }
 
@@ -102,7 +102,7 @@ export class NotFoundError extends ClientWebApplicationError {
  */
 export class MethodNotAllowedError extends ClientWebApplicationError {
   constructor (message?: string, options?: ErrorOptions) {
-    super(405, message);
+    super(405, message, options);
   }
 }
 
@@ -112,7 +112,7 @@ export class MethodNotAllowedError extends ClientWebApplicationError {
  */
 export class NotAcceptableError extends ClientWebApplicationError {
   constructor (message?: string, options?: ErrorOptions) {
-    super(406, message);
+    super(406, message, options);
   }
 }
 
@@ -121,7 +121,7 @@ export class NotAcceptableError extends ClientWebApplicationError {
  */
 export class ProxyAuthenticationRequiredError extends ClientWebApplicationError {
   constructor (message?: string, options?: ErrorOptions) {
-    super(407, message);
+    super(407, message, options);
   }
 }
 
@@ -133,7 +133,7 @@ export class ProxyAuthenticationRequiredError extends ClientWebApplicationError 
  */
 export class RequestTimeoutError extends ClientWebApplicationError {
   constructor (message?: string, options?: ErrorOptions) {
-    super(408, message);
+    super(408, message, options);
   }
 }
 
@@ -144,7 +144,7 @@ export class RequestTimeoutError extends ClientWebApplicationError {
  */
 export class ConflictError extends ClientWebApplicationError {
   constructor (message?: string, options?: ErrorOptions) {
-    super(409, message);
+    super(409, message, options);
   }
 }
 
@@ -156,7 +156,7 @@ export class ConflictError extends ClientWebApplicationError {
  */
 export class GoneError extends ClientWebApplicationError {
   constructor (message?: string, options?: ErrorOptions) {
-    super(410, message);
+    super(410, message, options);
   }
 }
 
@@ -166,7 +166,7 @@ export class GoneError extends ClientWebApplicationError {
  */
 export class LengthRequiredError extends ClientWebApplicationError {
   constructor (message?: string, options?: ErrorOptions) {
-    super(411, message);
+    super(411, message, options);
   }
 }
 
@@ -176,7 +176,7 @@ export class LengthRequiredError extends ClientWebApplicationError {
  */
 export class PreconditionFailedError extends ClientWebApplicationError {
   constructor (message?: string, options?: ErrorOptions) {
-    super(412, message);
+    super(412, message, options);
   }
 }
 
@@ -186,7 +186,7 @@ export class PreconditionFailedError extends ClientWebApplicationError {
  */
 export class PayloadTooLargeError extends ClientWebApplicationError {
   constructor (message?: string, options?: ErrorOptions) {
-    super(413, message);
+    super(413, message, options);
   }
 }
 
@@ -197,7 +197,7 @@ export class PayloadTooLargeError extends ClientWebApplicationError {
  */
 export class URITooLongError extends ClientWebApplicationError {
   constructor (message?: string, options?: ErrorOptions) {
-    super(414, message);
+    super(414, message, options);
   }
 }
 
@@ -208,7 +208,7 @@ export class URITooLongError extends ClientWebApplicationError {
  */
 export class UnsupportedMediaTypeError extends ClientWebApplicationError {
   constructor (message?: string, options?: ErrorOptions) {
-    super(415, message);
+    super(415, message, options);
   }
 }
 
@@ -218,7 +218,7 @@ export class UnsupportedMediaTypeError extends ClientWebApplicationError {
  */
 export class RangeNotSatisfiableError extends ClientWebApplicationError {
   constructor (message?: string, options?: ErrorOptions) {
-    super(416, message);
+    super(416, message, options);
   }
 }
 
@@ -228,7 +228,7 @@ export class RangeNotSatisfiableError extends ClientWebApplicationError {
  */
 export class ExpectationFailedError extends ClientWebApplicationError {
   constructor (message?: string, options?: ErrorOptions) {
-    super(417, message);
+    super(417, message, options);
   }
 }
 
@@ -242,7 +242,7 @@ export class IAmATeapotError extends ClientWebApplicationError {
   private readonly reasonString = "I'm a Teapot";
 
   constructor (message?: string, options?: ErrorOptions) {
-    super(418, message);
+    super(418, message, options);
   }
 
   public get reason (): string {
@@ -256,7 +256,7 @@ export class IAmATeapotError extends ClientWebApplicationError {
  */
 export class MisdirectedRequestError extends ClientWebApplicationError {
   constructor (message?: string, options?: ErrorOptions) {
-    super(421, message);
+    super(421, message, options);
   }
 }
 
@@ -266,7 +266,7 @@ export class MisdirectedRequestError extends ClientWebApplicationError {
  */
 export class UnprocessableContentError extends ClientWebApplicationError {
   constructor (message?: string, options?: ErrorOptions) {
-    super(422, message);
+    super(422, message, options);
   }
 }
 
@@ -275,7 +275,7 @@ export class UnprocessableContentError extends ClientWebApplicationError {
  */
 export class LockedError extends ClientWebApplicationError {
   constructor (message?: string, options?: ErrorOptions) {
-    super(423, message);
+    super(423, message, options);
   }
 }
 
@@ -285,7 +285,7 @@ export class LockedError extends ClientWebApplicationError {
  */
 export class FailedDependencyError extends ClientWebApplicationError {
   constructor (message?: string, options?: ErrorOptions) {
-    super(424, message);
+    super(424, message, options);
   }
 }
 
@@ -295,7 +295,7 @@ export class FailedDependencyError extends ClientWebApplicationError {
  */
 export class TooEarlyError extends ClientWebApplicationError {
   constructor (message?: string, options?: ErrorOptions) {
-    super(425, message);
+    super(425, message, options);
   }
 }
 
@@ -305,7 +305,7 @@ export class TooEarlyError extends ClientWebApplicationError {
  */
 export class UpgradeRequiredError extends ClientWebApplicationError {
   constructor (message?: string, options?: ErrorOptions) {
-    super(426, message);
+    super(426, message, options);
   }
 }
 
@@ -318,7 +318,7 @@ export class UpgradeRequiredError extends ClientWebApplicationError {
  */
 export class PreconditionRequiredError extends ClientWebApplicationError {
   constructor (message?: string, options?: ErrorOptions) {
-    super(428, message);
+    super(428, message, options);
   }
 }
 
@@ -328,7 +328,7 @@ export class PreconditionRequiredError extends ClientWebApplicationError {
  */
 export class TooManyRequestsError extends ClientWebApplicationError {
   constructor (message?: string, options?: ErrorOptions) {
-    super(429, message);
+    super(429, message, options);
   }
 }
 
@@ -339,7 +339,7 @@ export class TooManyRequestsError extends ClientWebApplicationError {
  */
 export class RequestHeaderFieldsTooLargeError extends ClientWebApplicationError {
   constructor (message?: string, options?: ErrorOptions) {
-    super(431, message);
+    super(431, message, options);
   }
 }
 
@@ -349,7 +349,7 @@ export class RequestHeaderFieldsTooLargeError extends ClientWebApplicationError 
  */
 export class UnavailableForLegalReasonsError extends ClientWebApplicationError {
   constructor (message?: string, options?: ErrorOptions) {
-    super(451, message);
+    super(451, message, options);
   }
 }
 
@@ -368,7 +368,7 @@ export class InternalServerError extends ServerWebApplicationError {
   private readonly reasonString = 'Internal Server Error';
 
   constructor (message?: string, options?: ErrorOptions) {
-    super(500, message);
+    super(500, message, options);
   }
 
   public get reason (): string {
@@ -383,7 +383,7 @@ export class InternalServerError extends ServerWebApplicationError {
  */
 export class NotImplementedError extends ServerWebApplicationError {
   constructor (message?: string, options?: ErrorOptions) {
-    super(501, message);
+    super(501, message, options);
   }
 }
 
@@ -393,7 +393,7 @@ export class NotImplementedError extends ServerWebApplicationError {
  */
 export class BadGatewayError extends ServerWebApplicationError {
   constructor (message?: string, options?: ErrorOptions) {
-    super(502, message);
+    super(502, message, options);
   }
 }
 
@@ -403,7 +403,7 @@ export class BadGatewayError extends ServerWebApplicationError {
  */
 export class ServiceUnavailableError extends ServerWebApplicationError {
   constructor (message?: string, options?: ErrorOptions) {
-    super(503, message);
+    super(503, message, options);
   }
 }
 
@@ -413,7 +413,7 @@ export class ServiceUnavailableError extends ServerWebApplicationError {
  */
 export class GatewayTimeoutError extends ServerWebApplicationError {
   constructor (message?: string, options?: ErrorOptions) {
-    super(504, message);
+    super(504, message, options);
   }
 }
 
@@ -422,7 +422,7 @@ export class GatewayTimeoutError extends ServerWebApplicationError {
  */
 export class HTTPVersionNotSupportedError extends ServerWebApplicationError {
   constructor (message?: string, options?: ErrorOptions) {
-    super(505, message);
+    super(505, message, options);
   }
 }
 
@@ -432,7 +432,7 @@ export class HTTPVersionNotSupportedError extends ServerWebApplicationError {
  */
 export class VariantAlsoNegotiatesError extends ServerWebApplicationError {
   constructor (message?: string, options?: ErrorOptions) {
-    super(506, message);
+    super(506, message, options);
   }
 }
 
@@ -442,7 +442,7 @@ export class VariantAlsoNegotiatesError extends ServerWebApplicationError {
  */
 export class InsufficientStorageError extends ServerWebApplicationError {
   constructor (message?: string, options?: ErrorOptions) {
-    super(507, message);
+    super(507, message, options);
   }
 }
 
@@ -452,7 +452,7 @@ export class InsufficientStorageError extends ServerWebApplicationError {
  */
 export class LoopDetectedError extends ServerWebApplicationError {
   constructor (message?: string, options?: ErrorOptions) {
-    super(508, message);
+    super(508, message, options);
   }
 }
 
@@ -462,7 +462,7 @@ export class LoopDetectedError extends ServerWebApplicationError {
  */
 export class NotExtendedError extends ServerWebApplicationError {
   constructor (message?: string, options?: ErrorOptions) {
-    super(510, message);
+    super(510, message, options);
   }
 }
 
@@ -472,6 +472,6 @@ export class NotExtendedError extends ServerWebApplicationError {
  */
 export class NetworkAuthenticationRequiredError extends ServerWebApplicationError {
   constructor (message?: string, options?: ErrorOptions) {
-    super(511, message);
+    super(511, message, options);
   }
 }
