@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import _ from 'lodash';
 import path from 'node:path';
+import stripJsonComments from 'strip-json-comments';
 import { PathUtil } from '../utils/PathUtil';
 import { StringUtil } from '../utils/StringUtil';
 
@@ -134,7 +135,7 @@ export class Annotation {
 
     if (isTypeScript && fs.existsSync(tsConfigPath)) {
       const contents = fs.readFileSync(tsConfigPath);
-      const tsConfig = JSON.parse(contents.toString());
+      const tsConfig = JSON.parse(stripJsonComments(contents.toString()));
       const outDir = tsConfig.compilerOptions?.outDir;
 
       if (outDir != null && outDir.length > 0) {
@@ -345,13 +346,13 @@ export class Annotation {
 
   private static async importClasses (modulePaths: string[], modulePathPrefix: string, moduleBasePath: string, decorator: Decorator): Promise<object[]> {
     const classArray: object[] = [];
-
-    for (const modulePath of modulePaths) {
+    const promiseArray: Array<Promise<void>> = [];
+    const importClassesForModulePath = async (modulePath: string): Promise<void> => {
       const relativeModulePath = `${modulePathPrefix}${modulePath.replace(moduleBasePath, '')}`.replace(/\\/g, '/');
 
       /* ignore types and tests */
       if (/[.]d[.]ts$/.test(relativeModulePath) || /[.]spec[.][jt]s$/.test(relativeModulePath)) {
-        continue;
+        return;
       }
 
       const module: Record<string, any> = await import(relativeModulePath);
@@ -367,7 +368,13 @@ export class Annotation {
           }
         }
       }
+    };
+
+    for (const modulePath of modulePaths) {
+      promiseArray.push(importClassesForModulePath(modulePath));
     }
+
+    await Promise.all(promiseArray);
 
     return classArray;
   }
