@@ -3,6 +3,7 @@
     "version": "0.0.0",
     "scripts": {
         "build": "tsc",
+        "clean": "find ./src -type f \\( -name '*.js' -o -name '*.d.ts' \\) -delete",
         "lint": "eslint --ext .ts .",
         "test": "jest"
     },
@@ -24,5 +25,8 @@
         "@sleekify/sleekify": "../../../",
         "@types/node": "^20.4.5",
         "node-sync": "^0.5.6"
+    },
+    "optionalDependencies": {
+        "fsevents": "^2.3.2"
     }
 }
