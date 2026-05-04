@@ -489,14 +489,19 @@ describe('Annotation', () => {
   it('When searching for inline JavaScript classes, then the classes are found', async () => {
     const examplePath = `examples${path.sep}typescript${path.sep}inline`;
 
-    execSyncWithOutput(`cd ${examplePath} && npm ci --prefer-offline`);
+    execSyncWithOutput(`cd ${examplePath} && npm ci --omit=optional --prefer-offline`);
+
+    if (process.env.CIRCLECI === undefined) {
+      execSyncWithOutput(`cd ${examplePath} && npm run clean`);
+    }
+
     execSyncWithOutput(`cd ${examplePath} && npm run build`);
 
     let output = execSync(`cd ${examplePath} && node src${path.sep}index.js`);
 
     expect(output.toString()).toBe("[ '/v1/products', '/v1/users', '/v1/users/{id}/products' ]\n");
 
-    output = execSync(`cd ${examplePath} && ts-node src${path.sep}index.ts`);
+    output = execSync(`cd ${examplePath} && npx ts-node src${path.sep}index.ts`);
 
     expect(output.toString()).toBe("[ '/v1/products', '/v1/users', '/v1/users/{id}/products' ]\n");
   }, 30000);
@@ -504,14 +509,19 @@ describe('Annotation', () => {
   it('When searching for JavaScript classes in outDir, then the classes are found', async () => {
     const examplePath = `examples${path.sep}typescript${path.sep}separate`;
 
-    execSyncWithOutput(`cd ${examplePath} && npm ci --prefer-offline`);
+    execSyncWithOutput(`cd ${examplePath} && npm ci --omit=optional --prefer-offline`);
+
+    if (process.env.CIRCLECI === undefined) {
+      execSyncWithOutput(`cd ${examplePath} && npm run clean`);
+    }
+
     execSyncWithOutput(`cd ${examplePath} && npm run build`);
 
     let output = execSync(`cd ${examplePath} && node dist${path.sep}src${path.sep}index.js`);
 
     expect(output.toString()).toBe("[ '/v1/products', '/v1/users', '/v1/users/{id}/products' ]\n");
 
-    output = execSync(`cd ${examplePath} && ts-node src${path.sep}index.ts`);
+    output = execSync(`cd ${examplePath} && npx ts-node src${path.sep}index.ts`);
 
     expect(output.toString()).toBe("[ '/v1/products', '/v1/users', '/v1/users/{id}/products' ]\n");
   }, 30000);
