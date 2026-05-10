@@ -3,6 +3,7 @@ import _ from 'lodash';
 import path from 'node:path';
 import stripJsonComments from 'strip-json-comments';
 import { PathUtil } from '../utils/PathUtil';
+import { StringUtil } from '../utils/StringUtil';
 
 export interface AnnotationOptions {
   /* is the annotation inherited (default true) */
@@ -379,12 +380,13 @@ export class Annotation {
   }
 }
 
+interface ClassKeyEntry { reference: object, key: number }
+
 /**
  * Class keys are hash codes of the cache definition.  Cache them to improve performance.
  */
 class ClassKeyCache {
-  private static readonly classMap = new WeakMap();
-  private static classIndex = 0;
+  private static classNameMap: Record<string, ClassKeyEntry[]> = {};
 
   /**
    * Get the key for the given class.
@@ -393,13 +395,32 @@ class ClassKeyCache {
    * @returns The class key or zero.
    */
   static get (target: object): number {
-    let key = this.classMap.get(target);
+    const constructorName = (target as any)?.prototype?.constructor?.name;
+    let entry: ClassKeyEntry | undefined = {
+      reference: target,
+      key: 0
+    };
 
-    if (key === undefined) {
-      key = this.classIndex++;
-      this.classMap.set(target, key);
+    if (constructorName != null) {
+      let entryList = ClassKeyCache.classNameMap[constructorName];
+
+      if (entryList === undefined) {
+        entryList = [];
+        ClassKeyCache.classNameMap[constructorName] = entryList;
+      }
+
+      entry = entryList.find((v: ClassKeyEntry) => v.reference === target);
+
+      if (entry === undefined) {
+        entry = {
+          reference: target,
+          key: StringUtil.getHashCode((target as any).toString())
+        };
+
+        entryList.push(entry);
+      }
     }
 
-    return key;
+    return entry.key;
   }
 }
