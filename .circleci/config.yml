@@ -111,6 +111,9 @@ jobs:
           command: git diff --exit-code
       - node/install:
           node-version: 24.20.0
+      - run:
+          name: Print trusted publishing Node version
+          command: node --version
       - store_test_results:
           path: ./test-results/
   Build Windows:
@@ -171,6 +174,9 @@ jobs:
             echo export PACKAGE_VERSION=$PACKAGE_VERSION >> $BASH_ENV
       - node/install:
           node-version: 24.20.0
+      - run:
+          name: Print trusted publishing Node version
+          command: node --version
       - run:
           name: NPM publish
           command: |
