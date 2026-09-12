@@ -124,6 +124,9 @@ jobs:
       - node/install-packages:
           pkg-manager: npm
       - run:
+          name: Check trusted publishing Node version
+          command: node --version
+      - run:
           name: Transpile TypeScript
           command: npm run build
       - run:
