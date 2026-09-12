@@ -2,35 +2,28 @@ import { execSync } from 'node:child_process';
 import path from 'node:path';
 import _ from 'lodash';
 import { Annotation, Path } from '../../src';
+import { PathUtil } from '../../src/utils/PathUtil';
 import { execSyncWithOutput } from '../helper';
 
 function decorator (value: any) {
-  return function (target: any, propertyKey?: string, _descriptor?: PropertyDescriptor): any {
-    Annotation.set(target, propertyKey, decorator, value);
+  return function (target: object, context: ClassDecoratorContext | ClassMethodDecoratorContext): any {
+    Annotation.set(target, decorator, context, value);
   };
 };
 
 Annotation.register(decorator, 'b82c7ea3-d235-46b6-aeec-3a6848fc9c36');
 
-function notInheritedDecorator (value: any) {
-  return function (target: any, propertyKey?: string, _descriptor?: PropertyDescriptor): any {
-    Annotation.set(target, propertyKey, notInheritedDecorator, value);
-  };
-};
-
-Annotation.register(notInheritedDecorator, '23d1c2f8-22ad-4eb2-80f3-a26f95b0b5d5', { isInherited: false });
-
 function notAdditiveDecorator (value: any) {
-  return function (target: any, propertyKey?: string, _descriptor?: PropertyDescriptor): any {
-    Annotation.set(target, propertyKey, notAdditiveDecorator, value);
+  return function (target: object, context: ClassDecoratorContext | ClassMethodDecoratorContext): any {
+    Annotation.set(target, notAdditiveDecorator, context, value);
   };
 };
 
 Annotation.register(notAdditiveDecorator, '8884b470-7a4a-4d82-8429-43a9fa4881ff', { isAdditive: false });
 
 function notRegisteredDecorator (value: any) {
-  return function (target: any, propertyKey?: string, _descriptor?: PropertyDescriptor): any {
-    Annotation.set(target, propertyKey, notRegisteredDecorator, value);
+  return function (target: object, context: ClassDecoratorContext | ClassMethodDecoratorContext): any {
+    Annotation.set(target, notRegisteredDecorator, context, value);
   };
 };
 
@@ -91,12 +84,6 @@ describe('Annotation', () => {
         description: 'decorator',
         decorator,
         isInherited: true,
-        isAdditive: true
-      },
-      {
-        description: 'non-inherited decorator',
-        decorator: notInheritedDecorator,
-        isInherited: false,
         isAdditive: true
       },
       {
@@ -207,16 +194,6 @@ describe('Annotation', () => {
           expect(Annotation.get(ChildClass, undefined, test.decorator)).toStrictEqual(value.value2);
         });
       }
-
-      it(`When ${value.description} ${test.description} is applied to a class method which does not exist, the annotation is not found`, () => {
-        class TargetClass {
-        }
-
-        Annotation.set(TargetClass, 'targetMethod', test.decorator, true);
-
-        expect(Annotation.exists(TargetClass, 'targetMethod', test.decorator)).toBe(false);
-        expect(Annotation.get(TargetClass, 'targetMethod', test.decorator)).toBeUndefined();
-      });
 
       it(`When ${value.description} ${test.description} is not applied to a class method, the annotation is not found`, () => {
         class TargetClass {
@@ -484,6 +461,30 @@ describe('Annotation', () => {
       '/v1/users',
       '/v1/users/{id}/products'
     ]);
+  });
+
+  it('When called from TypeScript with a configured output directory, then classes are found', async () => {
+    const getCallerFilename = jest.spyOn(PathUtil, 'getCallerFilename').mockReturnValue(__filename);
+
+    try {
+      const classesArray = await Annotation.getClassesAnnotatedWith('../data', Path);
+
+      expect(classesArray).toHaveLength(3);
+    } finally {
+      getCallerFilename.mockRestore();
+    }
+  });
+
+  it('When called from JavaScript, then JavaScript modules are inspected', async () => {
+    const getCallerFilename = jest.spyOn(PathUtil, 'getCallerFilename').mockReturnValue(
+      path.join(__dirname, 'caller.js')
+    );
+
+    try {
+      await expect(Annotation.getClassesAnnotatedWith('../utils/data', Path)).resolves.toStrictEqual([]);
+    } finally {
+      getCallerFilename.mockRestore();
+    }
   });
 
   it('When searching for inline JavaScript classes, then the classes are found', async () => {

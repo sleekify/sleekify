@@ -1,5 +1,5 @@
 import { Annotation } from './Annotation';
-import { type ComponentsObject } from '../types/types';
+import type { ComponentsObject } from '../types/types';
 
 /**
  * You may apply this decorator to your resource class to annotate the class
@@ -15,9 +15,9 @@ import { type ComponentsObject } from '../types/types';
  *
  * @param componentsObject The OpenAPI components object definition
  */
-export function Components (componentsObject: ComponentsObject): (target: object) => void {
-  return function (target: object): void {
-    Annotation.set(target, undefined, Components, componentsObject);
+export function Components (componentsObject: ComponentsObject) {
+  return function (target: object, context: ClassDecoratorContext): any {
+    Annotation.set(target, Components, context, componentsObject);
   };
 };
 

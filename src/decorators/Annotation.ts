@@ -3,11 +3,9 @@ import _ from 'lodash';
 import path from 'node:path';
 import stripJsonComments from 'strip-json-comments';
 import { PathUtil } from '../utils/PathUtil';
-import { StringUtil } from '../utils/StringUtil';
+import '../utils/polyfill';
 
 export interface AnnotationOptions {
-  /* is the annotation inherited (default true) */
-  isInherited?: boolean
   /* does the annotation inherit defaults from the parent (default true) */
   isAdditive?: boolean
 };
@@ -46,18 +44,13 @@ export class Annotation {
     }
 
     const {
-      key: decoratorKey,
-      isInherited
+      key: decoratorKey
     } = settings;
-    let valueList: any[];
 
-    if (undefined === propertyKey) {
-      valueList = Annotation.getValueListForClass(target, decoratorKey, isInherited);
-    } else {
-      valueList = Annotation.getValueListForProperty(target, propertyKey, decoratorKey, isInherited);
-    }
+    const decoratorMap = (target as any)[Symbol.metadata]?.[decoratorKey];
+    const value = decoratorMap?.[propertyKey ?? ''];
 
-    return valueList.length > 0;
+    return value !== undefined;
   }
 
   /**
@@ -75,42 +68,13 @@ export class Annotation {
     }
 
     const {
-      key: decoratorKey,
-      isAdditive,
-      isInherited
+      key: decoratorKey
     } = settings;
-    let valueList: any[];
 
-    if (undefined === propertyKey) {
-      valueList = Annotation.getValueListForClass(target, decoratorKey, isInherited);
-    } else {
-      valueList = Annotation.getValueListForProperty(target, propertyKey, decoratorKey, isInherited);
-    }
+    const decoratorMap = (target as any)[Symbol.metadata]?.[decoratorKey];
+    const value = decoratorMap?.[propertyKey ?? ''];
 
-    if (valueList.length === 0 || valueList.every(((v: any) => v === EMPTY))) {
-      /* no values */
-      return;
-    }
-
-    if (!_.isObject(valueList[0]) || _.isArray(valueList[0])) {
-      /* primitive or array value */
-      return valueList[0];
-    }
-
-    /* build an object which inherits from parent decorator values */
-    const objectValue = {};
-
-    for (const value of valueList) {
-      if (_.isObject(value)) {
-        _.defaultsDeep(objectValue, value);
-      }
-
-      if (!isAdditive) {
-        break;
-      }
-    }
-
-    return objectValue;
+    return value !== EMPTY ? value : undefined;
   }
 
   /**
@@ -138,9 +102,7 @@ export class Annotation {
       const tsConfig = JSON.parse(stripJsonComments(contents.toString()));
       const outDir = tsConfig.compilerOptions?.outDir;
 
-      if (outDir != null && outDir.length > 0) {
-        hasTypesScriptOutDir = true;
-      }
+      hasTypesScriptOutDir = outDir != null && outDir.length > 0;
     }
 
     let updatedRelativePath = relativePath.replace(/\//g, path.sep);
@@ -179,169 +141,51 @@ export class Annotation {
   static register (decorator: Decorator, key: string, options?: AnnotationOptions): void {
     const annotatedDecorator: AnnotatedDecorator = decorator;
 
-    if (annotatedDecorator.$annotations === undefined) {
-      annotatedDecorator.$annotations = {
-        key,
-        isInherited: options?.isInherited ?? true,
-        isAdditive: options?.isAdditive ?? true
-      };
-    }
+    annotatedDecorator.$annotations = {
+      key,
+      isAdditive: options?.isAdditive ?? true
+    };
   }
 
   /**
    * Sets the annotation's value.
    * @param target The class
-   * @param propertyKey The property name
    * @param decorator The decorator being used as an annotation
+   * @param context The decorator context
    * @param value The annotation's value
    */
-  static set (target: object, propertyKey: string | undefined, decorator: Decorator, value?: any): void {
-    const annotatedDecorator: AnnotatedDecorator = decorator;
+  static set (target: object, decorator: Decorator, context: ClassDecoratorContext | ClassMethodDecoratorContext, value?: any): void {
+    const settings = (decorator as AnnotatedDecorator).$annotations;
 
-    if (annotatedDecorator.$annotations === undefined) {
+    if (settings === undefined) {
       throw new Error('The annotation has not been registered');
     }
 
-    const decoratorKey = annotatedDecorator.$annotations.key;
-    const annotationMap = Annotation.getAnnotationMap(target, propertyKey);
+    const {
+      key: decoratorKey,
+      isAdditive
+    } = settings;
 
-    if (undefined === annotationMap) {
-      return;
-    }
+    const decoratorMap: Record<string, any> = context.metadata[decoratorKey] ?? { };
+    const propertyKey = context.kind === 'method' ? context.name.toString() : '';
+    const existingValue = decoratorMap[propertyKey];
+    const resolvedValue = Annotation.getResolvedValue(isAdditive, existingValue, value);
 
-    annotationMap[decoratorKey] = value ?? EMPTY;
+    context.metadata[decoratorKey] = { ...decoratorMap, [propertyKey]: resolvedValue };
   }
 
-  private static getAnnotationMap (target: object, propertyKey: string | undefined): Record<string, any> | undefined {
-    if (undefined === propertyKey) {
-      const classReference: any = target;
-      const classKey = this.getClassKey(classReference);
+  private static getResolvedValue (isAdditive: boolean, existingValue: any, value: any): any {
+    let resolvedValue;
 
-      /* class annotation */
-      if (undefined === classReference.$annotations) {
-        classReference.$annotations = {};
-      }
-
-      if (undefined === classReference.$annotations[classKey]) {
-        classReference.$annotations[classKey] = {};
-      }
-
-      return classReference.$annotations[classKey];
-    }
-
-    const descriptor = Object.getOwnPropertyDescriptor(target, propertyKey);
-    const targetValue: any = (target as any)[propertyKey];
-
-    if (undefined !== descriptor && _.isFunction(targetValue)) {
-      const classReference: any = target.constructor.name === 'Function' ? target : (target as any).constructor;
-      const classKey = this.getClassKey(classReference);
-
-      /* property annotation */
-      if (undefined === classReference.$annotations) {
-        classReference.$annotations = {};
-      }
-
-      if (undefined === classReference.$annotations[classKey]) {
-        classReference.$annotations[classKey] = {};
-      }
-
-      if (undefined === classReference.$annotations[classKey][propertyKey]) {
-        classReference.$annotations[classKey][propertyKey] = {};
-      }
-
-      return classReference.$annotations[classKey][propertyKey];
-    }
-
-    return undefined;
-  }
-
-  private static getClassKey (target: any): number {
-    return ClassKeyCache.get(target);
-  }
-
-  private static getValueForClass (target: any, decoratorKey: string): any {
-    if (undefined === target.$annotations) {
-      return undefined;
-    }
-
-    const classKey = this.getClassKey(target);
-
-    if (undefined === target.$annotations[classKey]) {
-      return undefined;
-    }
-
-    return target.$annotations[classKey][decoratorKey];
-  }
-
-  private static getValueListForClass (target: any, decoratorKey: string, inherited: boolean): any[] {
-    const valueList: any[] = [];
-
-    for (let currentTarget = target; currentTarget !== undefined && currentTarget?.constructor?.name !== 'Object'; currentTarget = Object.getPrototypeOf(currentTarget)) {
-      const value = Annotation.getValueForClass(currentTarget, decoratorKey);
-
-      if (value != null) {
-        valueList.push(value);
-      }
-
-      if (!inherited) {
-        break;
-      }
-    }
-
-    return valueList;
-  }
-
-  private static getValueForProperty (target: any, propertyKey: string, decoratorKey: string): any {
-    if (undefined === target.$annotations) {
-      return undefined;
-    }
-
-    const classKey = this.getClassKey(target);
-
-    if (undefined === target.$annotations[classKey]) {
-      return undefined;
-    }
-
-    if (undefined === target.$annotations[classKey][propertyKey]) {
-      return undefined;
-    }
-
-    return target.$annotations[classKey][propertyKey][decoratorKey];
-  }
-
-  private static getValueListForProperty (target: any, propertyKey: string, decoratorKey: string, inherited: boolean): any[] {
-    const valueList: any[] = [];
-    let isProperty = false;
-    const staticDescriptor = Object.getOwnPropertyDescriptor(target, propertyKey);
-    const staticTargetValue: any = (target)[propertyKey];
-
-    if (undefined !== staticDescriptor && _.isFunction(staticTargetValue)) {
-      /* static property annotation */
-      isProperty = true;
+    if (isAdditive && existingValue !== EMPTY && (_.isPlainObject(existingValue) || _.isArray(existingValue))) {
+      resolvedValue = _.defaultsDeep({
+        ...value
+      }, existingValue);
     } else {
-      const instanceTargetValue: any = target.prototype?.[propertyKey];
-
-      if (_.isFunction(instanceTargetValue)) {
-        /* property annotation */
-        isProperty = true;
-      }
+      resolvedValue = value ?? existingValue ?? EMPTY;
     }
 
-    if (isProperty) {
-      for (let currentTarget = target; currentTarget !== undefined && currentTarget?.constructor?.name !== 'Object'; currentTarget = Object.getPrototypeOf(currentTarget)) {
-        const value = Annotation.getValueForProperty(currentTarget, propertyKey, decoratorKey);
-
-        if (value != null) {
-          valueList.push(value);
-        }
-
-        if (!inherited) {
-          break;
-        }
-      }
-    }
-
-    return valueList;
+    return resolvedValue;
   }
 
   private static async importClasses (modulePaths: string[], modulePathPrefix: string, moduleBasePath: string, decorator: Decorator): Promise<object[]> {
@@ -357,17 +201,15 @@ export class Annotation {
 
       const module: Record<string, any> = await import(relativeModulePath);
 
-      if (_.isObject(module)) {
-        for (const exportName in module) {
-          const exportValue = module[exportName];
+      for (const exportName in module) {
+        const exportValue = module[exportName];
 
-          if (_.isObject(exportValue)) {
-            if (Annotation.exists(exportValue, undefined, decorator)) {
-              classArray.push(exportValue);
-            }
+        if (_.isObject(exportValue)) {
+          if (Annotation.exists(exportValue, undefined, decorator)) {
+            classArray.push(exportValue);
           }
         }
-      }
+      }      
     };
 
     for (const modulePath of modulePaths) {
@@ -377,50 +219,5 @@ export class Annotation {
     await Promise.all(promiseArray);
 
     return classArray;
-  }
-}
-
-interface ClassKeyEntry { reference: object, key: number }
-
-/**
- * Class keys are hash codes of the cache definition.  Cache them to improve performance.
- */
-class ClassKeyCache {
-  private static classNameMap: Record<string, ClassKeyEntry[]> = {};
-
-  /**
-   * Get the key for the given class.
-   *
-   * @param target The class
-   * @returns The class key or zero.
-   */
-  static get (target: object): number {
-    const constructorName = (target as any)?.prototype?.constructor?.name;
-    let entry: ClassKeyEntry | undefined = {
-      reference: target,
-      key: 0
-    };
-
-    if (constructorName != null) {
-      let entryList = ClassKeyCache.classNameMap[constructorName];
-
-      if (entryList === undefined) {
-        entryList = [];
-        ClassKeyCache.classNameMap[constructorName] = entryList;
-      }
-
-      entry = entryList.find((v: ClassKeyEntry) => v.reference === target);
-
-      if (entry === undefined) {
-        entry = {
-          reference: target,
-          key: StringUtil.getHashCode((target as any).toString())
-        };
-
-        entryList.push(entry);
-      }
-    }
-
-    return entry.key;
   }
 }

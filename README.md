@@ -9,15 +9,23 @@ Your API documentation will both match the OpenAPI specification's schema and be
 
 ## Versions
 
-| Sleekify | Node.js | OpenAPI Specification |
-| -------- | ------- | --------------------- |
-| 1.0.0+   | 20      | 3.1.1                 |
+| Sleekify | Node.js | OpenAPI Specification | TypeScript | TypeScript Config               | Decorator Type |
+| -------- | ------- | --------------------- | ---------- | ------------------------------- | -------------- |
+| 2.0.0+   | 24      | 3.1.1                 | 5.9+       | "experimentalDecorators": false | new ES/TC39           |
+| 1.0.0+   | 20      | 3.1.1                 | 5.0+       | "experimentalDecorators": true  | old experimental   |
 
 ## Getting Started
 
-Follow the instructions provided by each integration:
+1. Make sure you are using typescript 5.2+ for TC39 decorator metadata.
+   ```
+   tsc --version
+   grep '"typescript"' package.json
+   ```
+2. Your `tsconfig.json` needs to have `experimentalDecorators` and `emitDecoratorMetadata` set to `false`.  Then set `useDecorators` to `true`.
+3. You can no longer use older experimental decorators in your project.
+4. Follow the instructions provided by each integration:
 
-- Fastify: https://github.com/sleekify/sleekify-fastify
+   - Fastify: https://github.com/sleekify/sleekify-fastify
 
 ## API Reference
 

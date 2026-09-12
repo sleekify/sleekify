@@ -16,3 +16,17 @@ Choose one of the provided templates (bug, documentation, enhancement, or mainte
 2. Fork the repository and create a branch off `main` that starts with your issue ID.
 3. Make your changes and write applicable tests as needed to maintain 100% branch and line coverage. 
 4. Submit your pull request with a brief title and a description that links to your issue.
+
+## Miscellaneous
+
+### Upgrading Typescript
+
+```
+npm install --save-dev eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin typescript
+```
+
+### Upgrading Jest
+
+```
+npm i --save-dev @types/jest jest jest-junit ts-jest
+```

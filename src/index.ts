@@ -14,4 +14,4 @@ export { Schema } from './decorators/Schema';
 export { TRACE } from './decorators/TRACE';
 
 export * from './errors/errors';
-export * from './types/types';
+export type * from './types/types';
