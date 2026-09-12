@@ -109,11 +109,6 @@ jobs:
       - run:
           name: Check git status
           command: git diff --exit-code
-      - node/install:
-          node-version: 24.20.0
-      - run:
-          name: Print trusted publishing Node version
-          command: node --version
       - store_test_results:
           path: ./test-results/
   Build Windows:
@@ -175,7 +170,7 @@ jobs:
       - node/install:
           node-version: 24.20.0
       - run:
-          name: Print trusted publishing Node version
+          name: Check trusted publishing Node version
           command: node --version
       - run:
           name: NPM publish
