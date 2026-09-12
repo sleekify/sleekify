@@ -124,9 +124,6 @@ jobs:
       - node/install-packages:
           pkg-manager: npm
       - run:
-          name: Check trusted publishing Node version
-          command: node --version
-      - run:
           name: Transpile TypeScript
           command: npm run build
       - run:
@@ -171,11 +168,6 @@ jobs:
             PACKAGE_VERSION=$(jq -r '.version' package.json)
             test "$PACKAGE_VERSION" != ""
             echo export PACKAGE_VERSION=$PACKAGE_VERSION >> $BASH_ENV
-      - node/install:
-          node-version: 24.20.0
-      - run:
-          name: Check trusted publishing Node version
-          command: node --version
       - run:
           name: NPM publish
           command: |
