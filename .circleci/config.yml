@@ -109,6 +109,12 @@ jobs:
       - run:
           name: Check git status
           command: git diff --exit-code
+      - run:
+          name: Override Node version for trusted publishing (test only)
+          command: |
+            nvm install 24.20
+            nvm use 24.20
+            node --version
       - store_test_results:
           path: ./test-results/
   Build Windows:
@@ -168,9 +174,16 @@ jobs:
             test "$PACKAGE_VERSION" != ""
             echo export PACKAGE_VERSION=$PACKAGE_VERSION >> $BASH_ENV
       - run:
+          name: Override Node version for trusted publishing
+          command: |
+            nvm install 24.20
+            nvm use 24.20
+            node --version
+      - run:
           name: NPM publish
           command: |
-            npm set //registry.npmjs.org/:_authToken=$NPM_TOKEN
+            NPM_ID_TOKEN=$(circleci run oidc get --claims '{"aud": "npm:registry.npmjs.org"}')
+            export NPM_ID_TOKEN
             npm publish --access public
       - run:
           name: Tag release
