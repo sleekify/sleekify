@@ -50,7 +50,6 @@ export class Annotation {
     const decoratorMap = (target as any)[Symbol.metadata]?.[decoratorKey];
     const value = decoratorMap?.[propertyKey ?? ''];
 
-    // console.log(`EXISTS: value=${JSON.stringify(value)} (${value !== undefined}, ${value !== EMPTY})`);
     return value !== undefined;
   }
 
