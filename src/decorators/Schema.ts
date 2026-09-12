@@ -1,5 +1,5 @@
 import { Annotation } from './Annotation';
-import { type SchemaObject } from '../types/types';
+import type { SchemaObject } from '../types/types';
 
 /**
  * You may apply this decorator to your resource class or the resource class's
@@ -10,10 +10,8 @@ import { type SchemaObject } from '../types/types';
  * @param schemaObject The optional OpenAPI schema object definition
  */
 export function Schema (schemaObject?: SchemaObject) {
-  return function (target: object,
-    propertyKey?: string,
-    _descriptor?: PropertyDescriptor): any {
-    Annotation.set(target, propertyKey, Schema, schemaObject);
+  return function (target: object, context: ClassDecoratorContext | ClassMethodDecoratorContext): any {
+    Annotation.set(target, Schema, context, schemaObject);
   };
 };
 

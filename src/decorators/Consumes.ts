@@ -11,10 +11,8 @@ import { Annotation } from './Annotation';
  * @param mediaTypes The supported media types
  */
 export function Consumes (mediaTypes: string[]) {
-  return function (target: object,
-    propertyKey?: string,
-    _descriptor?: PropertyDescriptor): any {
-    Annotation.set(target, propertyKey, Consumes, mediaTypes);
+  return function (target: object, context: ClassDecoratorContext | ClassMethodDecoratorContext): any {
+    Annotation.set(target, Consumes, context, mediaTypes);
   };
 };
 

@@ -1,4 +1,4 @@
-import { type OpenAPIV3_1 as Source } from 'openapi-types';
+import type { OpenAPIV3_1 as Source } from 'openapi-types';
 
 /**
  * @see https://spec.openapis.org/oas/v3.1.1.html#callback-object
@@ -284,6 +284,7 @@ export type TagObject = Omit<Source.TagObject, 'externalDocs'> & CustomPropertie
  */
 export type XMLObject = Source.XMLObject & CustomProperties;
 
+// eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
 type CustomProperties = {
   [K in `x-${string}`]?: any;
 };

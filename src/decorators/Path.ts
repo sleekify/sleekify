@@ -1,5 +1,5 @@
 import { Annotation } from './Annotation';
-import { type PathItemObject as Source } from '../types/types';
+import type { PathItemObject as Source } from '../types/types';
 import _ from 'lodash';
 
 type PathItemObject = {
@@ -26,7 +26,7 @@ type PathItemObject = {
  *
  * @param pathItemObject The path or an optional OpenAPI path item object definition
  */
-export function Path (pathItemObject: string | PathItemObject): (target: object) => void {
+export function Path (pathItemObject: string | PathItemObject): (target: object, context: ClassDecoratorContext) => any {
   if (_.isString(pathItemObject)) {
     pathItemObject = {
       path: pathItemObject
@@ -45,8 +45,8 @@ export function Path (pathItemObject: string | PathItemObject): (target: object)
     throw new Error(`The Path annotation value of '${pathItemObject.path}' must not end with /`);
   }
 
-  return function (target: object): void {
-    Annotation.set(target, undefined, Path, pathItemObject);
+  return function (target: object, context: ClassDecoratorContext): any {
+    Annotation.set(target, Path, context, pathItemObject);
   };
 };
 

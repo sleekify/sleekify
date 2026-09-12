@@ -51,7 +51,7 @@ export class PathUtil {
     let modulePaths;
 
     if (options?.isTypeScript === true) {
-      if (options?.hasTypesScriptOutDir) {
+      if (options.hasTypesScriptOutDir) {
         modulePaths = await glob(`${globPath}*(*.js|*.ts)`);
       } else {
         const tsModulePaths = await glob(`${globPath}*.ts`);
@@ -65,6 +65,7 @@ export class PathUtil {
         modulePaths = [...tsModulePaths];
 
         for (const jsPath of jsModulePaths) {
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
           if (!pathMap[jsPath.slice(0, -3)]) {
             modulePaths.push(jsPath);
           }

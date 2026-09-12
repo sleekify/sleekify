@@ -54,9 +54,10 @@ jobs:
       - run:
           name: Get expected version
           command: |
-            EXPECTED_MINOR=$(if [[ "$ISSUE_TYPE" == "enhancement" ]]; then echo $((RELEASE_MINOR+1)); else echo $RELEASE_MINOR; fi)
-            EXPECTED_PATCH=$(if [[ "$ISSUE_TYPE" == "enhancement" ]]; then echo 0; else echo $((RELEASE_PATCH+1)); fi)
-            EXPECTED_VERSION=$RELEASE_MAJOR.$EXPECTED_MINOR.$EXPECTED_PATCH
+            EXPECTED_MAJOR=$(if [[ "$ISSUE_TYPE" == "architecture" ]]; then echo $((RELEASE_MAJOR+1)); else echo $RELEASE_MAJOR; fi)
+            EXPECTED_MINOR=$(if [[ "$ISSUE_TYPE" == "architecture" ]]; then echo 0; elif [[ "$ISSUE_TYPE" == "enhancement" ]]; then echo $((RELEASE_MINOR+1)); else echo $RELEASE_MINOR; fi)
+            EXPECTED_PATCH=$(if [[ "$ISSUE_TYPE" == "architecture" || "$ISSUE_TYPE" == "enhancement" ]]; then echo 0; else echo $((RELEASE_PATCH+1)); fi)
+            EXPECTED_VERSION=$EXPECTED_MAJOR.$EXPECTED_MINOR.$EXPECTED_PATCH
             echo export EXPECTED_VERSION=$EXPECTED_VERSION >> $BASH_ENV
       - run:
           name: Print versions

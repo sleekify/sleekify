@@ -1,5 +1,5 @@
 import { Annotation } from './Annotation';
-import { type OperationObject } from '../types/types';
+import type { OperationObject } from '../types/types';
 
 /**
  * You may apply this decorator to your resource class's methods to indicate
@@ -10,10 +10,8 @@ import { type OperationObject } from '../types/types';
  * @param operationObject The optional OpenAPI operation object definition
  */
 export function PUT (operationObject?: OperationObject) {
-  return function (target: object,
-    propertyKey: string,
-    _descriptor?: PropertyDescriptor): any {
-    Annotation.set(target, propertyKey, PUT, operationObject);
+  return function (target: object, context: ClassMethodDecoratorContext): any {
+    Annotation.set(target, PUT, context, operationObject);
   };
 };
 

@@ -19,6 +19,7 @@ export class WebApplicationError extends Error {
   public get reason (): string {
     let reason = WebApplicationError.reasonMap[this.statusCode];
 
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (reason === undefined) {
       reason = this.constructor.name
         .replace('Error', '')

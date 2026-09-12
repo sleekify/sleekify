@@ -274,6 +274,9 @@ describe('errors', () => {
         expect(error.status).toBe(test.status);
         expect(error.reason).toBe(test.reason);
         expect(error.cause).toStrictEqual(cause);
+
+        // And
+        expect(error.reason).toBe(test.reason);
       });
     });
   });
