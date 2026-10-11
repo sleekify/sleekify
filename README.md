@@ -9,21 +9,57 @@ Your API documentation will both match the OpenAPI specification's schema and be
 
 ## Versions
 
-| Sleekify | Node.js | OpenAPI Specification | TypeScript | TypeScript Config               | Decorator Type |
-| -------- | ------- | --------------------- | ---------- | ------------------------------- | -------------- |
-| 2.0.0+   | 24      | 3.1.1                 | 5.9+       | "experimentalDecorators": false | new ES/TC39           |
-| 1.0.0+   | 20      | 3.1.1                 | 5.0+       | "experimentalDecorators": true  | old experimental   |
+| Sleekify | Node.js | OpenAPI Specification | TypeScript | TypeScript Config                 | Decorator Type      |
+| -------- | ------- | --------------------- | ---------- | --------------------------------- | ------------------- |
+| 2.0.0+   | 24      | 3.1.1                 | 5.9+       | `"experimentalDecorators": false` | Standard ES/TC39    |
+| 1.0.0+   | 20      | 3.1.1                 | 5.0+       | `"experimentalDecorators": true`  | Legacy experimental |
+
+### Choosing a Version
+
+The main difference between the two major versions is the kind of TypeScript decorators they use.
+Because `experimentalDecorators` applies to your whole project, the version you pick depends on which decorators the rest of your project uses.
+
+#### 2.0.0+ (Standard ES/TC39 decorators)
+
+This is the recommended version for new projects.
+It uses the standard ES/TC39 decorators which are supported by TypeScript without any special compiler options.
+
+#### 1.0.0+ (Legacy experimental decorators)
+
+Choose this version if your project depends on other libraries which only support legacy experimental decorators.
+For example, [Typegoose](https://typegoose.github.io/typegoose/) doesn't support the standard ES/TC39 decorators, so if you use Typegoose you should stick with a 1.0.0+ version.
+
+> [!WARNING]
+> When using a 1.0.0+ version, keep your resource class names unique if possible.
+> This helps Sleekify identify your resource classes.
 
 ## Getting Started
 
-1. Make sure you are using typescript 5.2+ for TC39 decorator metadata.
+1. Install Sleekify.
+   ```
+   npm install @sleekify/sleekify
+   ```
+1. Make sure you are using TypeScript 5.9 or later.
    ```
    tsc --version
    grep '"typescript"' package.json
    ```
-2. Your `tsconfig.json` needs to have `experimentalDecorators` and `emitDecoratorMetadata` set to `false`.  Then set `useDecorators` to `true`.
-3. You can no longer use older experimental decorators in your project.
-4. Follow the instructions provided by each integration:
+1. Sleekify 2.x uses standard ES/TC39 decorators, so no special compiler option is needed to enable them.
+   Just make sure the legacy experimental decorators are turned off in your `tsconfig.json`, either by omitting these options or setting them to `false`:
+   ```json
+   {
+     "compilerOptions": {
+       "experimentalDecorators": false,
+       "emitDecoratorMetadata": false
+     }
+   }
+   ```
+
+   Node.js 24 doesn't provide `Symbol.metadata` yet, which standard decorators need for storing metadata.
+   Sleekify adds it for you automatically when its decorators are imported, so you don't need to install a polyfill yourself.
+1. Since `experimentalDecorators` applies to the whole project, you can't mix Sleekify 2.x with libraries that require legacy experimental decorators.
+   If you need those, stay on Sleekify 1.x.
+1. Follow the instructions provided by each integration:
 
    - Fastify: https://github.com/sleekify/sleekify-fastify
 
@@ -33,11 +69,13 @@ Your API documentation will both match the OpenAPI specification's schema and be
 
 <sub>_src/v1/users.ts_</sub>
 ```TypeScript
+import { GET, Path, POST, Schema } from '@sleekify/sleekify';
+
 @Path('/v1/users')
 @Schema({
   $ref: '#/components/schemas/user'
 })
-export class UsersIdResource {
+export class UsersResource {
   @GET()
   async getMany () {
     // TODO: your read user code here
@@ -62,6 +100,8 @@ Decorator inheritance allows you to split the OpenAPI definitions across a resou
 
 <sub>_src/v1/AbstractSingleResource.ts_</sub>
 ```TypeScript
+import { Components, GET } from '@sleekify/sleekify';
+
 @Components({
   parameters: {
     id: {
@@ -114,6 +154,9 @@ If you ever need to remove a property from an OpenAPI definition, you must defin
 
 <sub>_src/v1/users.ts_</sub>
 ```TypeScript
+import { Components, GET, Path, Schema } from '@sleekify/sleekify';
+import { AbstractSingleResource } from './AbstractSingleResource';
+
 @Components({
   schemas: {
     user: {
@@ -150,7 +193,7 @@ export class UsersIdResource extends AbstractSingleResource {
 }
 ```
 
-In the example above, `UserIdResource` will inherit the `@GET` responses from `AbstractSingleResource` and add its own description for the GET operation.
+In the example above, `UsersIdResource` will inherit the `@GET` responses from `AbstractSingleResource` and add its own description for the GET operation.
 
 
 ### Class Decorators
@@ -199,11 +242,53 @@ This utility allows you to search for classes which have an Sleekify decorator o
 | Annotation.get(target, propertyKey, decorator) | Gets the annotation's value. |
 | Annotation.getClassesAnnotatedWith(relativePath, decorator) | Finds classes annotated with the decoration by searching files recursively under the provided relative path.  The classes must be exported as a named exports since default exports aren't supported. |
 
+For example, to find all of your resource classes and list their paths:
+
+<sub>_src/index.ts_</sub>
+```TypeScript
+import { Annotation, Path } from '@sleekify/sleekify';
+
+async function listPaths (): Promise<void> {
+  const resourceClasses = await Annotation.getClassesAnnotatedWith('./v1', Path);
+
+  for (const resourceClass of resourceClasses) {
+    const pathItemObject = Annotation.get(resourceClass, undefined, Path);
+
+    console.log(pathItemObject.path);
+  }
+}
+```
+
+> [!NOTE]
+> The relative path is resolved from the directory of the file which calls `getClassesAnnotatedWith`, not from the current working directory.
+> In the example above, `./v1` refers to `src/v1`.
+
 ### Web Application Errors
 
 These web application errors are provided since throwing errors is the best approach for generating error responses.
 This prevents HTTP concerns from leaking into other application layers and allows you to take advantage of error chaining via the error `cause` property.
 You may define your own error handler to serialize errors into error responses which keeps error formatting in a single code location.
+
+```TypeScript
+import { GET, NotFoundError, Path } from '@sleekify/sleekify';
+
+@Path('/v1/users/{id}')
+export class UsersIdResource {
+  @GET()
+  async getOne () {
+    const user: object | undefined = undefined; // TODO: look up the user here
+
+    if (user === undefined) {
+      throw new NotFoundError('The user was not found');
+    }
+
+    return user;
+  }
+}
+```
+
+Each error provides a `status` property with its HTTP status code and a `reason` property with its reason phrase, such as `"Not Found"`.
+Every error constructor also accepts an optional `{ cause }` option for error chaining.
 
 #### Client Errors
 
@@ -252,4 +337,16 @@ You may define your own error handler to serialize errors into error responses w
 | InsufficientStorageError | 507 | |
 | LoopDetectedError | 508 | |
 | NotExtendedError | 510 | |
-| NetworkAuthenticationRequiredError | 511 |
+| NetworkAuthenticationRequiredError | 511 | |
+
+## Contributing
+
+Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) for our code of conduct.
+
+## Security
+
+To report a security vulnerability, see [SECURITY.md](SECURITY.md).
+
+## License
+
+Sleekify is licensed under the [Apache License 2.0](LICENSE).
