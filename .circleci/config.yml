@@ -5,7 +5,7 @@ orbs:
 parameters: 
   release_branch:
     type: string
-    default: main
+    default: 100-release-branch
 jobs:
   Check Version:
     executor: node/default

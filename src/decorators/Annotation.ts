@@ -357,14 +357,12 @@ export class Annotation {
 
       const module: Record<string, any> = await import(relativeModulePath);
 
-      if (_.isObject(module)) {
-        for (const exportName in module) {
-          const exportValue = module[exportName];
+      for (const exportName in module) {
+        const exportValue = module[exportName];
 
-          if (_.isObject(exportValue)) {
-            if (Annotation.exists(exportValue, undefined, decorator)) {
-              classArray.push(exportValue);
-            }
+        if (_.isObject(exportValue)) {
+          if (Annotation.exists(exportValue, undefined, decorator)) {
+            classArray.push(exportValue);
           }
         }
       }

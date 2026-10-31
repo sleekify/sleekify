@@ -1,8 +1,10 @@
 import { execSync } from 'node:child_process';
+import fs from 'node:fs';
 import path from 'node:path';
 import _ from 'lodash';
 import { Annotation, Path } from '../../src';
 import { execSyncWithOutput } from '../helper';
+import { getClassesAnnotatedWith } from '../javascript/finder';
 
 function decorator (value: any) {
   return function (target: any, propertyKey?: string, _descriptor?: PropertyDescriptor): any {
@@ -484,6 +486,109 @@ describe('Annotation', () => {
       '/v1/users',
       '/v1/users/{id}/products'
     ]);
+  });
+
+  it('When searching for classes from a JavaScript file, then only the annotated classes are found', async () => {
+    const classesArray = await getClassesAnnotatedWith('./data', Path);
+    const pathArray: string[] = [];
+
+    for (const clazz of classesArray) {
+      const path = Annotation.get(clazz, undefined, Path);
+
+      pathArray.push(path.path);
+    }
+
+    expect(pathArray).toStrictEqual([
+      '/v1/javascript'
+    ]);
+  });
+
+  it('When searching for classes without a TypeScript outDir, then the classes are found', async () => {
+    jest.spyOn(fs, 'readFileSync').mockReturnValueOnce(Buffer.from('{ "compilerOptions": {} }'));
+
+    const classesArray = await Annotation.getClassesAnnotatedWith('./data', Path);
+    const pathArray: string[] = [];
+
+    jest.restoreAllMocks();
+
+    for (const clazz of classesArray) {
+      const path = Annotation.get(clazz, undefined, Path);
+
+      pathArray.push(path.path);
+    }
+
+    expect(pathArray.sort()).toStrictEqual([
+      '/v1/products',
+      '/v1/users',
+      '/v1/users/{id}/products'
+    ]);
+  });
+
+  it('When a decorator is registered twice, then the first registration is kept', () => {
+    function registeredTwiceDecorator (value: any) {
+      return function (target: any, propertyKey?: string, _descriptor?: PropertyDescriptor): any {
+        Annotation.set(target, propertyKey, registeredTwiceDecorator, value);
+      };
+    };
+
+    Annotation.register(registeredTwiceDecorator, 'a6f0e3c2-4a5b-4c1e-9a77-1e0f5b2c8d41', { isInherited: false });
+    Annotation.register(registeredTwiceDecorator, 'e1d7b9a4-0c3f-4e62-8b15-6f2a9d3c7e58', { isInherited: true });
+
+    @registeredTwiceDecorator(1)
+    class ParentClass {
+    }
+
+    class ChildClass extends ParentClass {
+    }
+
+    expect(Annotation.get(ParentClass, undefined, registeredTwiceDecorator)).toBe(1);
+    expect(Annotation.exists(ChildClass, undefined, registeredTwiceDecorator)).toBe(false);
+  });
+
+  it('When multiple decorators are applied to a class, then each annotation can be read', () => {
+    @decorator({ a: 1 })
+    @notInheritedDecorator(2)
+    class TargetClass {
+    }
+
+    expect(Annotation.get(TargetClass, undefined, decorator)).toStrictEqual({ a: 1 });
+    expect(Annotation.get(TargetClass, undefined, notInheritedDecorator)).toBe(2);
+  });
+
+  it('When decorators are applied to multiple class methods, then each annotation can be read', () => {
+    class TargetClass {
+      @decorator({ a: 1 })
+      @notInheritedDecorator(2)
+      firstMethod (): void {}
+
+      @decorator({ b: 2 })
+      secondMethod (): void {}
+    }
+
+    expect(Annotation.get(TargetClass, 'firstMethod', decorator)).toStrictEqual({ a: 1 });
+    expect(Annotation.get(TargetClass, 'firstMethod', notInheritedDecorator)).toBe(2);
+    expect(Annotation.get(TargetClass, 'secondMethod', decorator)).toStrictEqual({ b: 2 });
+  });
+
+  it('When an object is applied to a child class and a primitive to its parent class, then only the object is read', () => {
+    @decorator('abc')
+    class ParentClass {
+    }
+
+    @decorator({ a: 1 })
+    class ChildClass extends ParentClass {
+    }
+
+    expect(Annotation.get(ChildClass, undefined, decorator)).toStrictEqual({ a: 1 });
+  });
+
+  it('When an annotation is applied to a function without a prototype, then the annotation can be read', () => {
+    const targetFunction = (): void => {};
+
+    Annotation.set(targetFunction, undefined, decorator, 'abc');
+
+    expect(Annotation.exists(targetFunction, undefined, decorator)).toBe(true);
+    expect(Annotation.get(targetFunction, undefined, decorator)).toBe('abc');
   });
 
   it('When searching for inline JavaScript classes, then the classes are found', async () => {
