@@ -4,6 +4,7 @@ module.exports = (async function config() {
     return [
         {
             ignores: [
+                '**/*.d.ts',
                 'build/',
                 'coverage/',
                 'dist/',
@@ -40,7 +41,25 @@ module.exports = (async function config() {
                 complexity: ['error', 10],
                 'max-lines-per-function': ['error', 50],
                 'no-extraneous-class': 'off',
-                'semi': [2, 'always']
+                'semi': [2, 'always'],
+                // Rules introduced between eslint-config-love 83 and 158 which are not yet adopted
+                '@eslint-community/eslint-comments/disable-enable-pair': 'off',
+                '@eslint-community/eslint-comments/require-description': 'off',
+                '@typescript-eslint/no-unsafe-type-assertion': 'off',
+                '@typescript-eslint/prefer-destructuring': 'off',
+                '@typescript-eslint/prefer-string-starts-ends-with': 'off',
+                '@typescript-eslint/require-await': 'off',
+                eqeqeq: 'off',
+                'guard-for-in': 'off',
+                'max-lines': 'off',
+                'max-nested-callbacks': 'off',
+                'no-console': 'off',
+                'no-negated-condition': 'off',
+                'no-param-reassign': 'off',
+                'no-plusplus': 'off',
+                'prefer-named-capture-group': 'off',
+                'require-unicode-regexp': 'off',
+                strict: 'off'
             },
         },
         {
