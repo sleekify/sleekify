@@ -277,4 +277,14 @@ describe('errors', () => {
       });
     });
   });
+
+  it('When the reason is read more than once, then the cached reason is returned', () => {
+    // When
+    const error1 = new NotFoundError();
+    const error2 = new NotFoundError();
+
+    // Then
+    expect(error1.reason).toBe('Not Found');
+    expect(error2.reason).toBe('Not Found');
+  });
 });
